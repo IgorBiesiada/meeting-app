@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
+
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -80,6 +82,13 @@ DATABASES = {
     }
 }
 
+DATABASES_URL = os.environ.get('DB_CONNECTION_STRING')
+dv_from_env = dj_database_url.config(
+    default=DATABASES_URL,
+    conn_max_age=500,
+    ssl_require=False
+)
+DATABASES['default'].update(dv_from_env)
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
