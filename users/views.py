@@ -1,6 +1,6 @@
 from django.contrib.auth.views import LoginView
 from .models import User
-from django.views.generic import CreateView
+from django.views.generic import CreateView, TemplateView
 from users.forms import UserRegistrationForm, UserLoginForm
 from django.core.mail import send_mail
 from config.settings import DEFAULT_FROM_EMAIL
@@ -28,3 +28,6 @@ class LoginUserView(LoginView):
     form_class = UserLoginForm
     template_name = 'login.html'
     success_url = reverse_lazy('home')
+
+class HomeBeforeLoginView(TemplateView):
+    template_name = 'landing_page.html'
