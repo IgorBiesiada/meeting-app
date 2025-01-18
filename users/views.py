@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from .models import User
 from django.views.generic import CreateView, TemplateView
@@ -29,5 +30,5 @@ class LoginUserView(LoginView):
     template_name = 'login.html'
     success_url = reverse_lazy('home')
 
-class HomeBeforeLoginView(TemplateView):
+class HomeBeforeLoginView(LoginRequiredMixin, TemplateView):
     template_name = 'landing_page.html'
