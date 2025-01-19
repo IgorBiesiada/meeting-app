@@ -1,8 +1,12 @@
+from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
+from django.shortcuts import redirect, render
+from django.views import View
+
 from .models import User
 from django.views.generic import CreateView, TemplateView
-from users.forms import UserRegistrationForm, UserLoginForm
+from users.forms import UserRegistrationForm, CustomUserLoginForm
 from django.core.mail import send_mail
 from config.settings import DEFAULT_FROM_EMAIL
 from django.urls import reverse_lazy
@@ -25,10 +29,13 @@ class RegisterUserView(CreateView):
         )
         return super().form_valid(form)
 
-class LoginUserView(LoginView):
-    form_class = UserLoginForm
+class CustomLoginUserView(LoginView):
+    form_class = CustomUserLoginForm
     template_name = 'login.html'
+    redirect_authenticated_user = False
     success_url = reverse_lazy('home')
 
-class HomeBeforeLoginView(LoginRequiredMixin, TemplateView):
+    def form_valid(self, form):
+        return super().form_valid(form)
+class HomeBeforeLoginView(TemplateView):
     template_name = 'landing_page.html'

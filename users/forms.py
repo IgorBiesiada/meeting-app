@@ -13,9 +13,7 @@ class UserRegistrationForm(UserCreationForm):
         fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
 
 
-class UserLoginForm(AuthenticationForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['username'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Username'})
-        self.fields['password'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Password'})
+class CustomUserLoginForm(AuthenticationForm):
+   username = forms.CharField(label='Username', widget=forms.TextInput(attrs={'class': 'form-control'}))
+   password = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
