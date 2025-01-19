@@ -6,10 +6,8 @@ from django.shortcuts import redirect
 # Create your views here.
 
 class HomeView(LoginRequiredMixin, View):
-    login_url = '/login/'
-    redirect_field_name = '/home/'
+    login_url = ''
+    redirect_field_name = 'landing_page'
 
     def get(self, request):
-        if request.user.is_authenticated:
-            return render(request, 'home.html')
-        return redirect('landing_page')
+        return render(request, 'home.html')

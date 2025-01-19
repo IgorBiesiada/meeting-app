@@ -29,19 +29,13 @@ class RegisterUserView(CreateView):
         )
         return super().form_valid(form)
 
-class CustomLoginUserView(View):
-    def get(self, request):
-        if request.user.is_authenticated:
-            return redirect('home')
-        form = UserRegistrationForm()
-        return render(request, 'landing_page.html', {'form': form})
+class CustomLoginUserView(LoginView):
+    form_class = CustomUserLoginForm
+    template_name = 'login.html'
+    redirect_authenticated_user = False
+    success_url = reverse_lazy('home')
 
-    def post(self, request):
-        form = CustomUserLoginForm
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect('home')
-        return render(request, 'landing_page.html', {'form': form})
-class HomeBeforeLoginView(LoginRequiredMixin, TemplateView):
+    def form_valid(self, form):
+        return super().form_valid(form)
+class HomeBeforeLoginView(TemplateView):
     template_name = 'landing_page.html'
