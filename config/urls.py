@@ -27,6 +27,6 @@ urlpatterns = [
     path('login/', CustomLoginUserView.as_view(), name='login'),
     path('', HomeBeforeLoginView.as_view(), name='landing_page'),
     path('home/', login_required(HomeView.as_view()), name='home'),
-    path('meetings/', MeetingListView.as_view(), name='meetings'),
-    path('add_meeting/', MeetingAddView.as_view(), name='add_meeting')
+    path('meetings/', login_required(MeetingListView.as_view()), name='meetings'),
+    path('add_meeting/', login_required(MeetingAddView.as_view()), name='add_meeting')
 ]

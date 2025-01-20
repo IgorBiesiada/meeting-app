@@ -1,6 +1,5 @@
-from msilib.schema import ListView
-
-from django.views.generic import CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import CreateView, ListView
 
 from meetings.forms import MeetingForm
 from meetings.models import Meeting
@@ -14,8 +13,12 @@ class MeetingListView(ListView):
     context_object_name = 'meetings'
     paginate_by = 20
 
-class MeetingAddView(CreateView):
+class MeetingAddView(LoginRequiredMixin, CreateView):
     model = Meeting
     form_class = MeetingForm
     template_name = 'add_meeting.html'
-    success_url = 'meetings_list'
+    success_url = 'meetings'
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
