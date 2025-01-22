@@ -12,6 +12,9 @@
         <h3>{{ meeting.title }}</h3>
         <p>-{{ meeting.date }} o {{ meeting.time }} </p>
         <a href="{% url 'meeting_detail' meeting.id %}">Szczegóły</a>
+        {% if request.user == meeting.created_by %}
+            <a href="{% url 'meeting_edit' meeting.id %}">Edytuj</a>
+        {% endif %}
     </li>
 {% endfor %}
 

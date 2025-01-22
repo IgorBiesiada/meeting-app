@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, DetailView
+from django.views.generic import CreateView, ListView, DetailView, UpdateView
 
 from meetings.forms import MeetingForm
 from meetings.models import Meeting
@@ -27,3 +27,9 @@ class MeetingAddView(LoginRequiredMixin, CreateView):
 class MeetingDetailView(LoginRequiredMixin, DetailView):
     model = Meeting
     template_name = 'meeting_details.html'
+
+class MeetingUpdateView(LoginRequiredMixin, UpdateView):
+    model = Meeting
+    fields = ['title', 'description', 'date', 'time', 'number_of_seats', 'price']
+    template_name = 'meeting_edit.html'
+    success_url = reverse_lazy('meetings')
