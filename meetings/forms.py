@@ -1,14 +1,13 @@
 from django.utils import timezone
-
 from django import forms
 
-class MeetingForm(forms.Form):
-    title = forms.CharField(max_length=100)
-    description = forms.CharField(max_length=500, widget=forms.TextInput())
-    date = forms.DateField()
-    time = forms.TimeField()
-    number_of_seats = forms.IntegerField()
-    price = forms.DecimalField(max_digits=10, decimal_places=2, required=False)
+from meetings.models import Meeting
+
+
+class MeetingForm(forms.ModelForm):
+    class Meta:
+       model = Meeting
+       fields = ['title', 'description', 'date', 'time', 'number_of_seats', 'price']
 
     def clean_date(self):
         event_data = self.cleaned_data.get('date')
