@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, DetailView, UpdateView
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 
 from meetings.forms import MeetingForm
 from meetings.models import Meeting
@@ -32,4 +32,9 @@ class MeetingUpdateView(LoginRequiredMixin, UpdateView):
     model = Meeting
     fields = ['title', 'description', 'date', 'time', 'number_of_seats', 'price']
     template_name = 'meeting_edit.html'
+    success_url = reverse_lazy('meetings')
+
+class DeleteMeetingView(LoginRequiredMixin, DeleteView):
+    model = Meeting
+    template_name = 'meeting_confirm_delete.html'
     success_url = reverse_lazy('meetings')
