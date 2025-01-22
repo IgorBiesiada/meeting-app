@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.urls import path
 from home.views import HomeView
-from meetings.views import MeetingListView, MeetingAddView
+from meetings.views import MeetingListView, MeetingAddView, MeetingDetailView
 from users.views import RegisterUserView, CustomLoginUserView, HomeBeforeLoginView
 
 urlpatterns = [
@@ -28,5 +28,6 @@ urlpatterns = [
     path('', HomeBeforeLoginView.as_view(), name='landing_page'),
     path('home/', login_required(HomeView.as_view()), name='home'),
     path('meetings/', login_required(MeetingListView.as_view()), name='meetings'),
-    path('add_meeting/', login_required(MeetingAddView.as_view()), name='add_meeting')
+    path('add_meeting/', login_required(MeetingAddView.as_view()), name='add_meeting'),
+    path('<int:pk>/', login_required(MeetingDetailView.as_view()), name='meeting_detail')
 ]

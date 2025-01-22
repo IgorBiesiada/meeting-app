@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, ListView, DetailView
 
 from meetings.forms import MeetingForm
 from meetings.models import Meeting
@@ -23,3 +23,7 @@ class MeetingAddView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
+
+class MeetingDetailView(LoginRequiredMixin, DetailView):
+    model = Meeting
+    template_name = 'meeting_details.html'
