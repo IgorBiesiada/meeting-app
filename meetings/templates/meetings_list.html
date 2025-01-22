@@ -11,6 +11,7 @@
     <li>
         <h3>{{ meeting.title }}</h3>
         <p>-{{ meeting.date }} o {{ meeting.time }} </p>
+        <a href="{% url 'meeting_detail' meeting.id %}">Szczegóły</a>
     </li>
 {% endfor %}
 
