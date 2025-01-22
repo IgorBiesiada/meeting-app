@@ -1,9 +1,12 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
+<script src="{% static 'scripts/delete.js' %}"defer></script>
 <body>
 <h2>Lista spotkan</h2>
 
@@ -14,6 +17,7 @@
         <a href="{% url 'meeting_detail' meeting.id %}">Szczegóły</a>
         {% if request.user == meeting.created_by %}
             <a href="{% url 'meeting_edit' meeting.id %}">Edytuj</a>
+            <a href="{% url 'meeting_delete' meeting.id %}">Usuń</a>
         {% endif %}
     </li>
 {% endfor %}
