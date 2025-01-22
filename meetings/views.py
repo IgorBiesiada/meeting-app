@@ -38,3 +38,12 @@ class DeleteMeetingView(LoginRequiredMixin, DeleteView):
     model = Meeting
     template_name = 'meeting_confirm_delete.html'
     success_url = reverse_lazy('meetings')
+
+class UserMeetingListView(LoginRequiredMixin, ListView):
+    model = Meeting
+    template_name = 'user_meetings.html'
+    context_object_name = 'meetings'
+    paginate_by = 20
+
+    def get_queryset(self):
+        return Meeting.objects.filter(created_by=self.request.user)
