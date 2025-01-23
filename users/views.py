@@ -1,9 +1,5 @@
-from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
-from django.shortcuts import redirect, render
-from django.views import View
-
 from .models import User
 from django.views.generic import CreateView, TemplateView
 from users.forms import UserRegistrationForm, CustomUserLoginForm
@@ -39,3 +35,7 @@ class CustomLoginUserView(LoginView):
         return super().form_valid(form)
 class HomeBeforeLoginView(TemplateView):
     template_name = 'landing_page.html'
+
+class LogoutUserView(TemplateView):
+    template_name = 'landing_page.html'
+
