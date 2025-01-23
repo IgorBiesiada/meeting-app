@@ -46,4 +46,5 @@ class UserMeetingListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return Meeting.objects.filter(created_by=self.request.user)
+        qs = Meeting.objects.filter(created_by=self.request.user)
+        return qs
