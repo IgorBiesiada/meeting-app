@@ -17,17 +17,3 @@ class CustomUserLoginForm(AuthenticationForm):
    username = forms.CharField(label='Username', widget=forms.TextInput(attrs={'class': 'form-control'}))
    password = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
-
-class UserUpdateEmailForm(forms.ModelForm):
-    email = forms.EmailField(max_length=150, required=True)
-
-    class Meta:
-        model = User
-        fields = ['email']
-
-class UserUpdateUsernameForm(forms.ModelForm):
-    username = forms.CharField(max_length=150, required=True)
-
-    class Meta:
-        model = User
-        fields = ['username']

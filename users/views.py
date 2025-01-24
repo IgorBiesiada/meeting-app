@@ -1,10 +1,7 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
-
-
 from .models import User
-from django.views.generic import CreateView, TemplateView, UpdateView
-from users.forms import UserRegistrationForm, CustomUserLoginForm, UserUpdateEmailForm, UserUpdateUsernameForm
+from django.views.generic import CreateView, TemplateView
+from users.forms import UserRegistrationForm, CustomUserLoginForm
 from django.core.mail import send_mail
 from config.settings import DEFAULT_FROM_EMAIL
 from django.urls import reverse_lazy
@@ -41,38 +38,3 @@ class HomeBeforeLoginView(TemplateView):
 class LogoutUserView(TemplateView):
     template_name = 'landing_page.html'
 
-class ChangeEmailView(UpdateView):
-    model = User
-    form_class = UserUpdateEmailForm
-    template_name = 'change_email.html'
-    success_url = reverse_lazy('home')
-
-    def form_valid(self, form):
-        email = form.cleaned_data['email']
-        send_mail(
-            'let s meet',
-            'Zmiana maila przebiegła pomyślnie. Od teraz na ten mail bedą przychodziły powiadomienia',
-            DEFAULT_FROM_EMAIL,
-            [email],
-            fail_silently=False
-        )
-
-        return super().form_valid(form)
-
-class ChangeUsernameView(LoginRequiredMixin,UpdateView):
-    model = User
-    form_class = UserUpdateUsernameForm
-    template_name = 'change_username.html'
-    success_url = reverse_lazy('home')
-
-    def form_valid(self, form):
-        email = self.request.user.email
-        send_mail(
-            'let s meet',
-            'Zmiana nazwy użytkownika przebiegła pomyślnie',
-            DEFAULT_FROM_EMAIL,
-            [email],
-            fail_silently=False
-        )
-
-        return super().form_valid(form)
