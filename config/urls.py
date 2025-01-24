@@ -19,7 +19,8 @@ from django.contrib.auth.decorators import login_required
 from django.urls import path
 from home.views import HomeView
 from meetings.views import MeetingListView, MeetingAddView, MeetingDetailView, MeetingUpdateView, DeleteMeetingView, UserMeetingListView
-from users.views import RegisterUserView, CustomLoginUserView, HomeBeforeLoginView, LogoutUserView, ChangeEmailView
+from users.views import (RegisterUserView, CustomLoginUserView, HomeBeforeLoginView, LogoutUserView, ChangeEmailView,
+    ChangeUsernameView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,5 +35,6 @@ urlpatterns = [
     path('<int:pk>/delete/', login_required(DeleteMeetingView.as_view()), name='meeting_delete'),
     path('user_meetings/', login_required(UserMeetingListView.as_view()), name='user_meetings'),
     path('logout_redirect/', LogoutUserView.as_view(), name='logout_redirect'),
-    path('<int:pk>/change_mail/', ChangeEmailView.as_view(), name='change_mail')
+    path('<int:pk>/change_mail/', ChangeEmailView.as_view(), name='change_mail'),
+    path('<int:pk>/change_username/', ChangeUsernameView.as_view(), name='change_username')
 ]
