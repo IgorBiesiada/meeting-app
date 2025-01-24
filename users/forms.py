@@ -24,3 +24,10 @@ class UserUpdateEmailForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['email']
+
+class UserUpdateUsernameForm(forms.ModelForm):
+    username = forms.CharField(max_length=150, required=True)
+
+    class Meta:
+        model = User
+        fields = ['username']
