@@ -10,6 +10,25 @@
 <body>
 <h2>Lista spotkan</h2>
 
+<form method="get" action="{% url 'meetings' %}">
+    <input type="text" name="q" placeholder="szukaj" value="{{ request.GET.q }}">
+
+    <label for="min_price">Cena od:</label>
+    <input type="number" name="min_price" step="0.01" value="{{ request.GET.min_price }}">
+
+    <label for="max_price">Cena do:</label>
+    <input type="number" name="max_price" step="0.01" value="{{ request.GET.max_price }}">
+
+    <label for="min_seats">Miejsca od:</label>
+    <input type="number" name="min_seats" value="{{ request.GET.min_seats }}">
+
+    <label for="max_seats">Miejsca do:</label>
+    <input type="number" name="max_seats" value="{{ request.GET.max_seats }}">
+
+    <button type="submit">Szukaj</button>
+</form>
+
+
 {% for meeting in meetings %}
     <li>
         <h3>{{ meeting.title }}</h3>
