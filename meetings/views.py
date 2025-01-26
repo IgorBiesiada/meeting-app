@@ -14,6 +14,28 @@ class MeetingListView(ListView):
     context_object_name = 'meetings'
     paginate_by = 20
 
+    def get_queryset(self):
+        queryset = Meeting.objects.all()
+        query = self.request.GET.get('q', '').strip()
+        min_price = self.request.GET.get('min_price', '')
+        max_price = self.request.GET.get('max_price', '')
+        min_number_of_seats = self.request.GET.get('min_number_of_seats', '')
+        max_number_of_seats = self.request.GET.get('max_number_of_seats', '')
+
+        if query:
+            queryset = queryset.filter(title__icontains=query)
+
+        if min_price:
+            queryset = queryset.filter(price__gte=min_price)
+        if max_price:
+            queryset = queryset.filter(price__lte=max_price)
+
+        if min_number_of_seats:
+            queryset = queryset.filter(number_of_seats__gte=min_number_of_seats)
+        if max_number_of_seats:
+            queryset = queryset.filter(number_of_seats__lte=max_number_of_seats)
+
+        return queryset
 class MeetingAddView(LoginRequiredMixin, CreateView):
     model = Meeting
     form_class = MeetingForm

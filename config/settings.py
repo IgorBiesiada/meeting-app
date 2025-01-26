@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'users',
     'home',
     'meetings',
-    'user_profile'
+    'user_profile',
+    'cities_light'
 ]
 
 AUTH_USER_MODEL = 'users.User'
@@ -139,7 +140,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -153,3 +156,5 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = os.environ.get('EMAIL_PORT')
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
 
+CITIES_LIGHT_INCLUDE_COUNTRIES = ['PL']
+CITIES_LIGHT_TRANSLATION_LANGUAGES = ['pl']
