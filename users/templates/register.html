@@ -1,5 +1,30 @@
+{% load static %}
+<script src="{% static 'scripts/register.js' %}"></script>
+
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    <label for="{{ form.username.id_for_label }}">Username</label>
+    {{ form.username }}
+
+    <label for="{{ form.first_name.id_for_label }}">First name</label>
+    {{ form.first_name }}
+
+    <label for="{{ form.last_name.id_for_label }}">Last name</label>
+    {{ form.last_name }}
+
+    <label for="{{ form.email.id_for_label }}">Email</label>
+    {{ form.email }}
+
+    <label for="{{ form.password1.id_for_label }}">Password</label>
+    {{ form.password1 }}
+
+    <label for="{{ form.password2.id_for_label }}">Confirm password</label>
+    {{ form.password2 }}
+
+    <label for="id_region">Region</label>
+    {{ form.region }}
+
+    <label for="id_city">City</label>
+    {{ form.city }}
     <button type="submit">Zarejestruj się</button>
 </form>
