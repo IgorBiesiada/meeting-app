@@ -1,10 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
-
 from meetings.forms import MeetingForm
 from meetings.models import Meeting
-
+from django.http import JsonResponse
+from cities_light.models import SubRegion, City
 
 # Create your views here.
 
@@ -70,3 +70,17 @@ class UserMeetingListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         qs = Meeting.objects.filter(created_by=self.request.user)
         return qs
+
+def get_meeting_subregion(request):
+    region_id = request.GET.get('region_id')
+    if region_id:
+        subregion = SubRegion.objects.filter(region_id=region_id).order_by('name').values('id', 'name')
+        return JsonResponse(list(subregion), safe=False)
+    return JsonResponse([], safe=False)
+
+def get_meeting_city(request):
+    region_id = request.GET.get('region_id')
+    if region_id:
+        cities = City.objects.filter(region_id=region_id).order_by('name').values('id', 'name')
+        return JsonResponse(list(cities), safe=False)
+    return JsonResponse([], safe=False)
