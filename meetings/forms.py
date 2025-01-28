@@ -1,14 +1,31 @@
 from django.utils import timezone
 from django import forms
-
+from cities_light.models import City, Region, SubRegion
 from meetings.models import Meeting
 
 
 class MeetingForm(forms.ModelForm):
     class Meta:
        model = Meeting
-       fields = ['title', 'description', 'date', 'time', 'number_of_seats', 'price']
+       fields = ['title', 'description', 'date', 'time', 'number_of_seats', 'price', 'meeting_city', 'meeting_region', 'meeting_subregion']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        region_id = self.initial.get('meeting_region') or self.data.get('meeting_region')
+        subregion_id = self.initial.get('meeting_subregion') or self.data.get('meeting_subregion')
+
+
+        if region_id:
+            self.fields['meeting_city'].queryset = City.objects.filter(region_id=region_id).order_by('name')
+        else:
+            self.fields['meeting_city'].queryset = City.objects.none()
+
+
+        if subregion_id:
+            self.fields['meeting_subregion'].queryset = SubRegion.objects.filter(region_id=region_id).order_by('name')
+        else:
+            self.fields['meeting_subregion'].queryset = SubRegion.objects.none()
     def clean_date(self):
         event_data = self.cleaned_data.get('date')
         if event_data and event_data < timezone.localdate():
@@ -26,3 +43,9 @@ class MeetingForm(forms.ModelForm):
         if event_number_of_seats <= 0:
             raise forms.ValidationError("Liczba miejsc nie może być minusowa lub być 0")
         return event_number_of_seats
+
+    def clean_meeting_place(self):
+        meeting_place = self.cleaned_data.get(['meeting_city', 'meeting_region', 'meeting_subregion'])
+        if not meeting_place:
+            raise forms.ValidationError("Wybierz miejsce spotkania")
+        return meeting_place

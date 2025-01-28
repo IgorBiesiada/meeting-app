@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.urls import path
 from home.views import HomeView
-from meetings.views import MeetingListView, MeetingAddView, MeetingDetailView, MeetingUpdateView, DeleteMeetingView, UserMeetingListView
+from meetings.views import MeetingListView, MeetingAddView, MeetingDetailView, MeetingUpdateView, DeleteMeetingView, UserMeetingListView, get_meeting_subregion, get_meeting_city
 from users.views import (RegisterUserView, CustomLoginUserView, HomeBeforeLoginView, LogoutUserView, get_city)
 from user_profile.views import ChangeEmailView, ChangeUsernameView, UserProfileView
 
@@ -40,5 +40,7 @@ urlpatterns = [
     path('<int:pk>/change_mail/', login_required(ChangeEmailView.as_view()), name='change_mail'),
     path('<int:pk>/change_username/', login_required(ChangeUsernameView.as_view()), name='change_username'),
     path('<int:pk>/user_profile/', login_required(UserProfileView.as_view()), name='user_profile'),
-    path('get_city/', get_city, name='get_city')
+    path('get_city/', get_city, name='get_city'),
+    path('get_cities/', get_meeting_city, name='get_cities'),
+    path('get_subregions/', get_meeting_subregion, name='get_subregions')
 ]
