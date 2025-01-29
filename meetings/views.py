@@ -2,6 +2,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
+
+from comments.models import Comment
 from meetings.forms import MeetingForm
 from meetings.models import Meeting
 from django.http import JsonResponse
@@ -50,6 +52,11 @@ class MeetingAddView(LoginRequiredMixin, CreateView):
 class MeetingDetailView(LoginRequiredMixin, DetailView):
     model = Meeting
     template_name = 'meeting_details.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comments'] = Comment.objects.filter(meeting=self.object)
+        return context
 
 class MeetingUpdateView(LoginRequiredMixin, UpdateView):
     model = Meeting
