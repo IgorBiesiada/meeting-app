@@ -6,3 +6,15 @@
 <h3>{{ meeting.waiting_people }}</h3>
 <h3>{{ meeting.price }}</h3>
 <h3>{{ meeting.created_by }}</h3>
+<a href="{% url 'add_comment' meeting.id %}">Dodaj komentarz</a>
+
+{% if comments %}
+    <ul>
+        {% for comment in comments %}
+            <li>
+                <strong>{{ comment.author.username }}</strong>: {{ comment.text }}
+                <br><small>{{ comment.created_at }}</small>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
