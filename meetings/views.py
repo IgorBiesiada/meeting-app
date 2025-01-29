@@ -1,11 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 from meetings.forms import MeetingForm
 from meetings.models import Meeting
 from django.http import JsonResponse
 from cities_light.models import SubRegion, City
-
+from geopy.geocoders import Nominatim
 # Create your views here.
 
 class MeetingListView(ListView):
@@ -84,3 +85,31 @@ def get_meeting_city(request):
         cities = City.objects.filter(region_id=region_id).order_by('name').values('id', 'name')
         return JsonResponse(list(cities), safe=False)
     return JsonResponse([], safe=False)
+
+def meetings_map_view(request):
+    geolocator = Nominatim(user_agent="myapp")
+
+    meetings = Meeting.objects.all()
+    locations = []
+
+    for meeting in meetings:
+        if meeting.meeting_city:
+            city_name = meeting.meeting_city.name
+            try:
+                location = geolocator.geocode(city_name)
+                if location:
+                    locations.append({
+                        'title': meeting.title,
+                        'lat': location.latitude,  # Szerokość geograficzna
+                        'lon': location.longitude,  # Długość geograficzna
+                        'description': meeting.description,
+                    })
+            except Exception as e:
+                print(f"Błąd podczas geokodowania {city_name}: {e}")
+                continue
+
+    context = {
+            'locations': locations,
+            }
+
+    return render(request, 'map.html', context)
