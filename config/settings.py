@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'home',
     'meetings',
     'user_profile',
-    'cities_light'
+    'cities_light',
 ]
 
 AUTH_USER_MODEL = 'users.User'
