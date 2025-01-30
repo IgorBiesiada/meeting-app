@@ -9,6 +9,10 @@ from meetings.models import Meeting
 from django.http import JsonResponse
 from cities_light.models import SubRegion, City
 from geopy.geocoders import Nominatim
+
+from participations.models import Participation
+
+
 # Create your views here.
 
 class MeetingListView(ListView):
@@ -55,7 +59,11 @@ class MeetingDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
         context['comments'] = Comment.objects.filter(meeting=self.object)
+
+        context['is_participant'] = Participation.objects.filter(meeting=self.object, participant=user).exists()
+
         return context
 
 class MeetingUpdateView(LoginRequiredMixin, UpdateView):

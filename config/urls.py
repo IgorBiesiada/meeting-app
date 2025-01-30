@@ -23,7 +23,7 @@ from home.views import HomeView
 from meetings.views import MeetingListView, MeetingAddView, MeetingDetailView, MeetingUpdateView, DeleteMeetingView, UserMeetingListView, get_meeting_subregion, get_meeting_city, meetings_map_view
 from users.views import (RegisterUserView, CustomLoginUserView, HomeBeforeLoginView, LogoutUserView, get_city)
 from user_profile.views import ChangeEmailView, ChangeUsernameView, UserProfileView
-
+from participations.views import MeetingParticipationView
 
 
 urlpatterns = [
@@ -46,5 +46,6 @@ urlpatterns = [
     path('get_cities/', get_meeting_city, name='get_cities'),
     path('get_subregions/', get_meeting_subregion, name='get_subregions'),
     path('meetings_map', meetings_map_view, name='meetings_map'),
-    path('add_comment/<int:meeting_id>/', AddCommentView.as_view(), name='add_comment')
+    path('add_comment/<int:meeting_id>/', AddCommentView.as_view(), name='add_comment'),
+    path('participation', MeetingParticipationView.as_view(), name='participation')
 ]
