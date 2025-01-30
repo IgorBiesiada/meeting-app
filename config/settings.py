@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'user_profile',
     'cities_light',
     'comments',
+    'participations'
 ]
 
 AUTH_USER_MODEL = 'users.User'
