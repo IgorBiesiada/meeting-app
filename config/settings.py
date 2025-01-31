@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'user_profile',
     'cities_light',
     'comments',
-    'participations'
+    'participations',
+    'payment'
 ]
 
 AUTH_USER_MODEL = 'users.User'
@@ -160,3 +161,6 @@ EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
 
 CITIES_LIGHT_INCLUDE_COUNTRIES = ['PL']
 CITIES_LIGHT_TRANSLATION_LANGUAGES = ['pl']
+
+STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
