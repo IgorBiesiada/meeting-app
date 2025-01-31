@@ -24,7 +24,7 @@ from meetings.views import MeetingListView, MeetingAddView, MeetingDetailView, M
 from users.views import (RegisterUserView, CustomLoginUserView, HomeBeforeLoginView, LogoutUserView, get_city)
 from user_profile.views import ChangeEmailView, ChangeUsernameView, UserProfileView
 from participations.views import MeetingParticipationView
-
+from payment.views import CreatePaymentView, PaymentCancelView, PaymentSuccessView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -47,5 +47,8 @@ urlpatterns = [
     path('get_subregions/', get_meeting_subregion, name='get_subregions'),
     path('meetings_map', meetings_map_view, name='meetings_map'),
     path('add_comment/<int:meeting_id>/', AddCommentView.as_view(), name='add_comment'),
-    path('participation', MeetingParticipationView.as_view(), name='participation')
+    path('participation/', MeetingParticipationView.as_view(), name='participation'),
+    path('<int:meeting_id>/payment/', CreatePaymentView.as_view(), name='payment'),
+    path('success/', PaymentSuccessView.as_view(), name='success'),
+    path('cancel/', PaymentCancelView.as_view(), name='cancel'),
 ]
