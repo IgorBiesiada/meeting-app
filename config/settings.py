@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'cities_light',
     'comments',
     'participations',
-    'payment'
+    'payment',
+    'user_messages',
 ]
 
 AUTH_USER_MODEL = 'users.User'

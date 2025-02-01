@@ -25,6 +25,7 @@ from users.views import (RegisterUserView, CustomLoginUserView, HomeBeforeLoginV
 from user_profile.views import ChangeEmailView, ChangeUsernameView, UserProfileView, ChangePasswordView
 from participations.views import MeetingParticipationView
 from payment.views import CreatePaymentView, PaymentCancelView, PaymentSuccessView
+from user_messages.views import UserMessagesView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -51,5 +52,6 @@ urlpatterns = [
     path('<int:meeting_id>/payment/', CreatePaymentView.as_view(), name='payment'),
     path('success/', PaymentSuccessView.as_view(), name='success'),
     path('cancel/', PaymentCancelView.as_view(), name='cancel'),
-    path('<int:pk>/change_password/', ChangePasswordView.as_view(), name='change_password')
+    path('<int:pk>/change_password/', ChangePasswordView.as_view(), name='change_password'),
+    path('messages/', UserMessagesView.as_view(), name='messages')
 ]
