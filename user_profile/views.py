@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import PasswordChangeView
 from django.core.mail import send_mail
 from django.http import Http404
 from django.shortcuts import render
@@ -60,3 +62,9 @@ class ChangeUsernameView(LoginRequiredMixin,UpdateView):
         )
 
         return super().form_valid(form)
+
+class ChangePasswordView(LoginRequiredMixin, PasswordChangeView):
+    model = User
+    form_class = PasswordChangeForm
+    template_name = 'change_password.html'
+    success_url = reverse_lazy('home')
