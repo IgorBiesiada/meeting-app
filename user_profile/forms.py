@@ -1,3 +1,5 @@
+from django.contrib.auth.forms import PasswordChangeForm
+
 from users.models import User
 from django import forms
 
@@ -14,3 +16,11 @@ class UserUpdateUsernameForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username']
+
+class ChangePasswordForm(PasswordChangeForm):
+    old_password = forms.CharField(widget=forms.PasswordInput, label="Stare hasło")
+    new_password = forms.CharField(widget=forms.PasswordInput, label='Nowe hasło')
+    new_password2 = forms.CharField(widget=forms.PasswordInput, label='Powtórz nowe hasło')
+
+    class Meta:
+        model = User

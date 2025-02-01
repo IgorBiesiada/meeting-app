@@ -22,7 +22,7 @@ from comments.views import AddCommentView
 from home.views import HomeView
 from meetings.views import MeetingListView, MeetingAddView, MeetingDetailView, MeetingUpdateView, DeleteMeetingView, UserMeetingListView, get_meeting_subregion, get_meeting_city, meetings_map_view
 from users.views import (RegisterUserView, CustomLoginUserView, HomeBeforeLoginView, LogoutUserView, get_city)
-from user_profile.views import ChangeEmailView, ChangeUsernameView, UserProfileView
+from user_profile.views import ChangeEmailView, ChangeUsernameView, UserProfileView, ChangePasswordView
 from participations.views import MeetingParticipationView
 from payment.views import CreatePaymentView, PaymentCancelView, PaymentSuccessView
 
@@ -51,4 +51,5 @@ urlpatterns = [
     path('<int:meeting_id>/payment/', CreatePaymentView.as_view(), name='payment'),
     path('success/', PaymentSuccessView.as_view(), name='success'),
     path('cancel/', PaymentCancelView.as_view(), name='cancel'),
+    path('<int:pk>/change_password/', ChangePasswordView.as_view(), name='change_password')
 ]
