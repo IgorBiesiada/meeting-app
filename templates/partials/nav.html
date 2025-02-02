@@ -1,7 +1,26 @@
-<div class="nav-nar">
-    <div class="nav-button"><a href="{% url 'home' %}">Home</a></div>
-    <div class="nav-button"><a href="{% url 'home' %}">Add Meeting</a></div>
-    <div class="nav-button"><a href="{% url 'home' %}">Meeting</a></div>
-    <div class="nav-button"><a href="{% url 'logout_redirect' %}">Wyloguj się</a></div>
-    <div class="nav-button"><a href="{% url 'user_profile' user.id %}">Profil</a></div>
-</div>
+{% load static %}
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'home' %}">Home</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'meetings' %}">Spotkania</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'user_meetings' %}">Moje spotkania</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'add_meeting' %}">Zaplanuj spotkanie</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'meetings_map' %}">mapa spotkań</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
