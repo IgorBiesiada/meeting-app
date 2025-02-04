@@ -1,6 +1,6 @@
 from django.utils import timezone
 from django import forms
-from cities_light.models import City, Region, SubRegion
+from cities_light.models import City, SubRegion
 from meetings.models import Meeting
 
 
@@ -49,3 +49,14 @@ class MeetingForm(forms.ModelForm):
         if not meeting_place:
             raise forms.ValidationError("Wybierz miejsce spotkania")
         return meeting_place
+
+    def clean_title(self):
+        meeting_title = self.cleaned_data.get('title')
+        if not meeting_title:
+            raise forms.ValidationError("Podaj tytuł spotkania")
+
+        if meeting_title.isdigit():
+            raise forms.ValidationError("Nazwa nie może być liczbą")
+
+        return meeting_title
+

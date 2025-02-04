@@ -7,3 +7,4 @@ from cities_light.models import City, Region
 class User(AbstractUser):
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, default=None)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True, default=None)
+    email = models.EmailField(unique=True)

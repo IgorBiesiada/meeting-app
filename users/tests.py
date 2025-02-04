@@ -103,3 +103,20 @@ def test_user_registration_duplicate():
         password='Testpassword1'
     )
 
+    client = Client()
+
+    data = {
+        'username': 'testuser',
+        'first_name': 'Test',
+        'last_name': 'User',
+        'email': 'test@email.com',  # Ten sam email
+        'password1': 'Testpassword1',
+        'password2': 'Testpassword1',
+        'region': region.id,
+        'city': city.id
+    }
+
+    response = client.post(reverse('register'), data)
+
+    assert response.status_code == 200
+    assert User.objects.count() == 1
