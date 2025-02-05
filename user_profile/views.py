@@ -16,7 +16,7 @@ from users.models import User
 # Create your views here.
 
 
-class UserProfileView(DetailView):
+class UserProfileView(LoginRequiredMixin, DetailView):
     model = User
     template_name = 'user_profile.html'
     context_object_name = 'user'
@@ -32,6 +32,12 @@ class ChangeEmailView(LoginRequiredMixin, UpdateView):
     form_class = UserUpdateEmailForm
     template_name = 'change_email.html'
     success_url = reverse_lazy('home')
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if obj != self.request.user:
+            raise Http404
+        return obj
 
     def form_valid(self, form):
         email = form.cleaned_data['email']
@@ -50,6 +56,12 @@ class ChangeUsernameView(LoginRequiredMixin,UpdateView):
     form_class = UserUpdateUsernameForm
     template_name = 'change_username.html'
     success_url = reverse_lazy('home')
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if obj != self.request.user:
+            raise Http404
+        return obj
 
     def form_valid(self, form):
         email = self.request.user.email

@@ -1,14 +1,14 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import View
 from django.contrib import messages
 from django.urls import reverse
 from meetings.models import Meeting
 from participations.models import Participation
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 
-class MeetingParticipationView(View):
+class MeetingParticipationView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         meeting_id = request.POST.get('meeting_id')
         action = request.POST.get('action')

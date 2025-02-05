@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 from comments.forms import CommentForm
 from comments.models import Comment
 from meetings.models import Meeting
@@ -9,7 +9,7 @@ from meetings.models import Meeting
 
 # Create your views here.
 
-class AddCommentView(CreateView):
+class AddCommentView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
     template_name = 'add_comment.html'
