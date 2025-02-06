@@ -2,7 +2,7 @@ from cities_light.models import Region, City
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import User
 from django import forms
-
+from untils import contains_bad_words
 
 class UserRegistrationForm(UserCreationForm):
     first_name = forms.CharField(max_length=100, required=True)
@@ -24,6 +24,12 @@ class UserRegistrationForm(UserCreationForm):
             self.fields['city'].queryset = City.objects.filter(region_id=region_id).order_by('name')
         else:
             self.fields['city'].queryset = City.objects.none()
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if contains_bad_words(username):
+            raise forms.ValidationError("Nazwa użytkownika zawiera nieodpowiednie słowa")
+        return super().clean_username()
 
 class CustomUserLoginForm(AuthenticationForm):
    username = forms.CharField(label='Username', widget=forms.TextInput(attrs={'class': 'form-control'}))
