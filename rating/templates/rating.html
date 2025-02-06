@@ -1,5 +1,15 @@
-<form method="post">
+{%extends 'base.html'%}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %} Dodaj ocenę {% endblock %}
+
+{% block container %}
+
+  <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {{ form|crispy }}
     <button type="submit">Dodaj ocenę</button>
   </form>
+
+{% endblock %}

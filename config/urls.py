@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LogoutView
 from django.urls import path
 
 from comments.views import AddCommentView
@@ -55,5 +56,6 @@ urlpatterns = [
     path('cancel/', PaymentCancelView.as_view(), name='cancel'),
     path('<int:pk>/change_password/', ChangePasswordView.as_view(), name='change_password'),
     path('messages/', UserMessagesView.as_view(), name='messages'),
-    path('<int:pk>/rate/', RatingAddView.as_view(), name='rating')
+    path('<int:pk>/rate/', RatingAddView.as_view(), name='rating'),
+    path('logout/', LogoutView.as_view(), name='logout')
 ]

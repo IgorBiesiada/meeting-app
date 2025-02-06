@@ -6,8 +6,8 @@ from untils import contains_bad_words
 
 class MeetingForm(forms.ModelForm):
     class Meta:
-       model = Meeting
-       fields = ['title', 'description', 'date', 'time', 'number_of_seats', 'price', 'meeting_city', 'meeting_region', 'meeting_subregion']
+        model = Meeting
+        fields = ['title', 'description', 'date', 'time', 'number_of_seats', 'price', 'meeting_city', 'meeting_region', 'meeting_subregion']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

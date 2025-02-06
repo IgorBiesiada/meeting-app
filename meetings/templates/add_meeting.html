@@ -1,9 +1,17 @@
+{%extends 'base.html'%}
 {% load static %}
-<script src="{% static 'scripts/meeting.js' %}"></script>
 
-<h2>Dodaj wydarzenie</h2>
+
+{% load crispy_forms_tags %}
+
+{% block title %} Dodaj wydarzenie {% endblock %}
+
+{% block container %}
+
   <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {{ form|crispy }}
     <button type="submit">Dodaj wydarzenie</button>
   </form>
+<script src="{% static 'scripts/meeting.js' %}"></script>
+{% endblock %}

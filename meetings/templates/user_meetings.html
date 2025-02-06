@@ -1,18 +1,21 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}user meetings{% endblock %}
+
+{% block container %}
 <h2>Twoje spotkania</h2>
-{% if meetings %}
+    {% if meetings %}
     {% for meeting in meetings %}
-        <p>{{ meeting.title }}</p>
+        <div class="card mb-3">
+        <h5 class="card-header">{{ meeting.title }}</h5>
+        <div class="card-body">
+        <h5 class="card-title">{{ meeting.date }}</h5>
+        <p class="card-text">{{ meeting.time }}</p>
+            <a href="{% url 'meeting_edit' meeting.id %}" class="btn btn-primary me-2 mb-2">Edytuj</a>
+            <a href="{% url 'meeting_delete' meeting.id %}" class="btn btn-primary me-2 mb-2">Usuń</a>
+  </div>
+</div>
     {% endfor %}
 {% endif %}
-</body>
-</html>
+{% endblock %}
