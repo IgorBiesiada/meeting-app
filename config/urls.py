@@ -26,6 +26,7 @@ from user_profile.views import ChangeEmailView, ChangeUsernameView, UserProfileV
 from participations.views import MeetingParticipationView
 from payment.views import CreatePaymentView, PaymentCancelView, PaymentSuccessView
 from user_messages.views import UserMessagesView
+from rating.views import RatingAddView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -53,5 +54,6 @@ urlpatterns = [
     path('success/', PaymentSuccessView.as_view(), name='success'),
     path('cancel/', PaymentCancelView.as_view(), name='cancel'),
     path('<int:pk>/change_password/', ChangePasswordView.as_view(), name='change_password'),
-    path('messages/', UserMessagesView.as_view(), name='messages')
+    path('messages/', UserMessagesView.as_view(), name='messages'),
+    path('<int:pk>/rate/', RatingAddView.as_view(), name='rating')
 ]

@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'participations',
     'payment',
     'user_messages',
+    'rating',
+
     'crispy_forms',
     'crispy_bootstrap5'
 ]

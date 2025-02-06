@@ -37,6 +37,12 @@
             <a href="{% url 'meeting_edit' meeting.id %}">Edytuj</a>
             <a href="{% url 'meeting_delete' meeting.id %}">Usuń</a>
         {% endif %}
+        {% if request.user != meeting.created_by %}
+            <a href="{% url 'rating' meeting.id %}">Zostaw ocenę</a>
+        {% endif %}
+        {% if meeting.ratings %}
+            <p>Średnia ocena: {{ meeting.get_average_rating }} ⭐</p>
+        {% endif %}
     </li>
 {% endfor %}
 

@@ -43,6 +43,7 @@ class MeetingListView(ListView):
             queryset = queryset.filter(number_of_seats__lte=max_number_of_seats)
 
         return queryset
+
 class MeetingAddView(LoginRequiredMixin, CreateView):
     model = Meeting
     form_class = MeetingForm
