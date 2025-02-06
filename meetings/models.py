@@ -1,7 +1,7 @@
 from django.db import models
 from config import settings
 from cities_light.models import City, Region, SubRegion
-
+from django.db.models import Avg
 # Create your models here.
 
 class Meeting(models.Model):
@@ -17,3 +17,9 @@ class Meeting(models.Model):
     meeting_city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, default=None)
     meeting_region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True, default=None)
     meeting_subregion = models.ForeignKey(SubRegion, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def get_average_rating(self):
+        ratings = self.ratings.all()
+        if ratings.exists():
+            return ratings.aggregate(Avg('rating'))['rating__avg']
+        return None
