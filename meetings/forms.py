@@ -2,7 +2,7 @@ from django.utils import timezone
 from django import forms
 from cities_light.models import City, SubRegion
 from meetings.models import Meeting
-
+from untils import contains_bad_words
 
 class MeetingForm(forms.ModelForm):
     class Meta:
@@ -58,5 +58,17 @@ class MeetingForm(forms.ModelForm):
         if meeting_title.isdigit():
             raise forms.ValidationError("Nazwa nie może być liczbą")
 
+        if contains_bad_words(meeting_title):
+            raise forms.ValidationError("Tytuł zawiera nieodpowienie słowa.")
+
         return meeting_title
 
+    def clean_description(self):
+        meeting_description = self.cleaned_data.get('description')
+        if not meeting_description:
+            raise forms.ValidationError("Podaj opis spotkania")
+
+        if contains_bad_words(meeting_description):
+            raise forms.ValidationError("Opis zawiera nieodpowiednie słowa")
+
+        return meeting_description
