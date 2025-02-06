@@ -63,3 +63,4 @@ class PaymentSuccessView(View):
             meeting.waiting_people += 1
             meeting.save()
             messages.success(self.request, 'Płatność zakończona, ale jesteś na liście oczekujących.')
+

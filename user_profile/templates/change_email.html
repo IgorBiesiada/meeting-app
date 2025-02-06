@@ -1,5 +1,15 @@
-<form method="post">
+{%extends 'base.html'%}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %} Zmień maila{% endblock %}
+
+{% block container %}
+
+  <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Zmień maila</button>
-</form>
+    {{ form|crispy }}
+    <button type="submit">Zapisz zmiany</button>
+  </form>
+
+{% endblock %}

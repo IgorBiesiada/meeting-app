@@ -1,17 +1,25 @@
+{% load static %}
 <!doctype html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page</title>
+    {% block styles%}
+        <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    {% endblock %}
+
+    {% block scripts %}
+        <script src="{% static 'scripts/bootstrap.bundle.min.js' %}" async defer></script>
+    {% endblock %}
 </head>
-<body>
-<h1>lading page</h1>
-<div class="button-placeholder">
-    <div class="landing-button"><a href="{% url 'register' %}">Zarejestruj się</a></div>
-    <div class="landing-button"><a href="{% url 'login' %}">Zaloguj się</a></div>
-</div>
+<body class="d-flex align-items-center justify-content-center vh-100 bg-light">
+    <div class="text-center">
+        <h1 class="mb-4">Lets meet</h1>
+        <div class="d-grid gap-3">
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Zarejestruj się</a>
+            <a href="{% url 'login' %}" class="btn btn-success btn-lg">Zaloguj się</a>
+        </div>
+    </div>
 </body>
 </html>

@@ -130,8 +130,8 @@ def contains_bad_words(text):
 
     for word in words:
         if word in BAD_WORDS:
-            return False
-    return True
+            return True
+    return False
 
 
 

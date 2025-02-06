@@ -27,7 +27,8 @@ class MeetingParticipationView(LoginRequiredMixin, View):
             else:
                 if meeting.price > 0:
                     return redirect(reverse('payment', kwargs={'meeting_id': meeting.id}))
-                self.add_participant(meeting, user)
+                else:
+                    self.add_participant(meeting, user)
 
         elif action == 'leave' and participation:
             self.remove_participant(meeting, participation)

@@ -1,13 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<div class="nav-button"><a href="{% url 'change_mail' user.id %}">zmien maila</a></div>
-<div class="nav-button"><a href="{% url 'change_username' user.id %}">zmien nazwe</a></div>
-<div class="nav-button"><a href="{% url 'change_password' user.id %}">zmien hasło</a></div>
-<div class="nav-button"><a href="{% url 'home' %}">home</a></div>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Profil użytkownika{% endblock %}
+
+
+{% block container %}
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">{{ user.username }}</h3>
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                <li class="list-group-item"><strong>Imię:</strong> {{ user.first_name }}</li>
+                <li class="list-group-item"><strong>Nazwisko:</strong> {{ user.last_name }}</li>
+                <li class="list-group-item"><strong>Email:</strong> {{ user.email }}</li>
+            </ul>
+
+            <div class="d-grid gap-2 mt-4">
+                <a href="{% url 'change_mail' user.id %}" class="btn btn-outline-primary">Zmień e-mail</a>
+                <a href="{% url 'change_username' user.id %}" class="btn btn-outline-success">Zmień nazwę</a>
+                <a href="{% url 'change_password' user.id %}" class="btn btn-outline-danger">Zmień hasło</a>
+                <a href="{% url 'home' %}" class="btn btn-secondary">Strona główna</a>
+                <form method="POST" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger">Wyloguj się</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
