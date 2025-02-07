@@ -28,12 +28,12 @@
         <!-- Filtr miejsc -->
         <div class="col-md-2">
             <label for="min_seats" class="form-label">Miejsca od:</label>
-            <input type="number" id="min_seats" name="min_seats" class="form-control" value="{{ request.GET.min_seats }}">
+            <input type="number" id="min_number_of_seats" name="min_number_of_seats" class="form-control" value="{{ request.GET.min_number_of_seats }}">
         </div>
 
         <div class="col-md-2">
             <label for="max_seats" class="form-label">Miejsca do:</label>
-            <input type="number" id="max_seats" name="max_seats" class="form-control" value="{{ request.GET.max_seats }}">
+            <input type="number" id="max_number_of_seats" name="max_number_of_seats" class="form-control" value="{{ request.GET.max_number_of_seats }}">
         </div>
 
         <!-- Przycisk wyszukiwania -->
@@ -51,17 +51,23 @@
         <div class="card-body">
         <h5 class="card-title">{{ meeting.date }}</h5>
         {% if meeting.ratings %}
-            <p class="card-text">Średnia ocena {{ meeting.get_average_rating }} ⭐</p>
+            <p class="card-text">{{ meeting.get_average_rating }} ⭐</p>
         {% endif %}
             <a href="{% url 'meeting_detail' meeting.id %}" class="btn btn-primary me-2 mb-2">Szczegóły</a>
         {% if request.user == meeting.created_by %}
             <a href="{% url 'meeting_edit' meeting.id %}" class="btn btn-primary me-2 mb-2">Edytuj</a>
             <a href="{% url 'meeting_delete' meeting.id %}" class="btn btn-primary me-2 mb-2">Usuń</a>
         {% endif %}
-        {% if request.user != meeting.created_by %}
-            <a href="{% url 'rating' meeting.id %}" class="btn btn-primary me-2 mb-2">Zostaw ocenę</a>
+        {% with user_rating=meeting.ratings.all|dictsortreversed:"id"|first %}
+            {% if request.user != user_rating.user %}
+                {% if not user_rating and request.user != meeting.created_by %}
+                <a href="{% url 'rating' meeting.id %}" class="btn btn-primary me-2 mb-2">Zostaw ocenę</a>
+                {% endif %}
+        {% else %}
+            <p>Dziękujemy za ocenę!🙂</p>
         {% endif %}
-  </div>
+        {% endwith %}
+        </div>
 </div>
 {% endfor %}
 {% endblock %}

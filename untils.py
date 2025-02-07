@@ -1,3 +1,6 @@
+from config.settings import PERSPECTIVE_API_KEY
+import requests
+
 BAD_WORDS = ('chuj','chuja', 'chujek', 'chuju', 'chujem', 'chujnia',
 'chujowy', 'chujowa', 'chujowe', 'cipa', 'cipę', 'cipe', 'cipą',
 'cipie', 'dojebać','dojebac', 'dojebie', 'dojebał', 'dojebal',
@@ -133,5 +136,22 @@ def contains_bad_words(text):
             return True
     return False
 
+API_KEY = PERSPECTIVE_API_KEY
+API_URL = 'https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze'
 
+def analyze_toxicity(text):
+    data = {
+        'comment': {"text": text},
+        "languages": ["pl"],
+        "requestedAttributes": {"TOXICITY": {}}
+    }
 
+    params = {'key': API_KEY}
+    response = requests.post(API_URL, json=data, params=params)
+    result = response.json()
+
+    toxicity = result['attributeScores']['TOXICITY']['summaryScore']['value']
+
+    if toxicity > 0.7:
+        return True
+    return False

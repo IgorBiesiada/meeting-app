@@ -2,7 +2,7 @@ from django.utils import timezone
 from django import forms
 from cities_light.models import City, SubRegion
 from meetings.models import Meeting
-from untils import contains_bad_words
+from untils import contains_bad_words, analyze_toxicity
 
 class MeetingForm(forms.ModelForm):
     class Meta:
@@ -61,6 +61,9 @@ class MeetingForm(forms.ModelForm):
         if contains_bad_words(meeting_title):
             raise forms.ValidationError("Tytuł zawiera nieodpowienie słowa.")
 
+        if analyze_toxicity(meeting_title):
+            raise forms.ValidationError("Tytuł spotkania jest toksyczny lub nieodpowiedni")
+
         return meeting_title
 
     def clean_description(self):
@@ -70,5 +73,8 @@ class MeetingForm(forms.ModelForm):
 
         if contains_bad_words(meeting_description):
             raise forms.ValidationError("Opis zawiera nieodpowiednie słowa")
+
+        if analyze_toxicity(meeting_description):
+            raise forms.ValidationError("Opis jest toksyczny lub nieodpowiedni")
 
         return meeting_description

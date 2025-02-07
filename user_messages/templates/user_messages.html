@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}user messages{% endblock %}
+
+{% block container %}
+<h2>wiadomosci do ciebie</h2>
+    {% if messages %}
+    {% for message in messages %}
+        <div class="card mb-3">
+        <h5 class="card-header">{{ message.sender.username }}</h5>
+        <div class="card-body">
+        <h5 class="card-title">{{ message.content }}</h5>
+        </div>
+</div>
+    {% endfor %}
+{% else %}
+    <h4>Brak wiadomości </h4>
+    {% endif %}
+{% endblock %}

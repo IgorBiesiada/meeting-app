@@ -2,7 +2,7 @@ from cities_light.models import Region, City
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import User
 from django import forms
-from untils import contains_bad_words
+from untils import contains_bad_words, analyze_toxicity
 
 class UserRegistrationForm(UserCreationForm):
     first_name = forms.CharField(max_length=100, required=True)
@@ -29,6 +29,10 @@ class UserRegistrationForm(UserCreationForm):
         username = self.cleaned_data.get('username')
         if contains_bad_words(username):
             raise forms.ValidationError("Nazwa użytkownika zawiera nieodpowiednie słowa")
+
+        if analyze_toxicity(username):
+            raise forms.ValidationError("Nazwa jest toksyczna lub nieodpowiednia")
+
         return super().clean_username()
 
 class CustomUserLoginForm(AuthenticationForm):

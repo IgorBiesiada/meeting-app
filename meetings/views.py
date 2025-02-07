@@ -6,16 +6,16 @@ from django.core.exceptions import PermissionDenied
 from comments.models import Comment
 from meetings.forms import MeetingForm
 from meetings.models import Meeting
-from django.http import JsonResponse, Http404
+from django.http import JsonResponse
 from cities_light.models import SubRegion, City
 from geopy.geocoders import Nominatim
-
+from django.contrib.auth.decorators import login_required
 from participations.models import Participation
 
 
 # Create your views here.
 
-class MeetingListView(ListView):
+class MeetingListView(LoginRequiredMixin, ListView):
     model = Meeting
     template_name = 'meetings_list.html'
     context_object_name = 'meetings'
@@ -33,13 +33,17 @@ class MeetingListView(ListView):
             queryset = queryset.filter(title__icontains=query)
 
         if min_price:
+            min_price = float(min_price)
             queryset = queryset.filter(price__gte=min_price)
         if max_price:
+            max_price = float(max_price)
             queryset = queryset.filter(price__lte=max_price)
 
         if min_number_of_seats:
+            min_number_of_seats = int(min_number_of_seats)
             queryset = queryset.filter(number_of_seats__gte=min_number_of_seats)
         if max_number_of_seats:
+            max_number_of_seats = int(max_number_of_seats)
             queryset = queryset.filter(number_of_seats__lte=max_number_of_seats)
 
         return queryset
@@ -114,6 +118,7 @@ def get_meeting_city(request):
         return JsonResponse(list(cities), safe=False)
     return JsonResponse([], safe=False)
 
+@login_required
 def meetings_map_view(request):
     geolocator = Nominatim(user_agent="myapp")
 

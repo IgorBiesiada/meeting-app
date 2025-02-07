@@ -1,7 +1,7 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 from meetings.models import Meeting
 from rating.forms import RatingForm
 from rating.models import Rating
@@ -9,7 +9,7 @@ from rating.models import Rating
 
 # Create your views here.
 
-class RatingAddView(CreateView):
+class RatingAddView(LoginRequiredMixin, CreateView):
     model = Rating
     form_class = RatingForm
     template_name = 'rating.html'
