@@ -8,3 +8,4 @@ class User(AbstractUser):
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, default=None)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True, default=None)
     email = models.EmailField(unique=True)
+    is_baned = models.BooleanField(default=False)

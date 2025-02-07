@@ -15,14 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LogoutView
 from django.urls import path
-
 from comments.views import AddCommentView
 from home.views import HomeView
 from meetings.views import MeetingListView, MeetingAddView, MeetingDetailView, MeetingUpdateView, DeleteMeetingView, UserMeetingListView, get_meeting_subregion, get_meeting_city, meetings_map_view
-from users.views import (RegisterUserView, CustomLoginUserView, HomeBeforeLoginView, LogoutUserView, get_city)
+from users.views import (RegisterUserView, CustomLoginUserView, HomeBeforeLoginView, LogoutUserView, get_city, BannedUsersView)
 from user_profile.views import ChangeEmailView, ChangeUsernameView, UserProfileView, ChangePasswordView
 from participations.views import MeetingParticipationView
 from payment.views import CreatePaymentView, PaymentCancelView, PaymentSuccessView
@@ -58,5 +56,6 @@ urlpatterns = [
     path('messages/', UserMessagesView.as_view(), name='messages'),
     path('<int:pk>/rate/', RatingAddView.as_view(), name='rating'),
     path('logout/', LogoutView.as_view(), name='logout'),
-    path('user_messages/', UserMessagesListView.as_view(), name='user_messages')
+    path('user_messages/', UserMessagesListView.as_view(), name='user_messages'),
+    path('banned/', BannedUsersView.as_view(), name='banned')
 ]
