@@ -1,6 +1,8 @@
 from cities_light.models import City
 from django.contrib.auth.views import LoginView
+from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
+from django.shortcuts import render, redirect
 
 from .models import User
 from django.views.generic import CreateView, TemplateView
@@ -42,10 +44,16 @@ class CustomLoginUserView(LoginView):
     form_class = CustomUserLoginForm
     template_name = 'login.html'
     redirect_authenticated_user = False
-    success_url = reverse_lazy('home')
 
     def form_valid(self, form):
+        user = form.get_user()
+        if user.is_baned:
+            return redirect(reverse_lazy('banned'))
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('home')
+
 class HomeBeforeLoginView(TemplateView):
     template_name = 'landing_page.html'
 
@@ -58,3 +66,6 @@ def get_city(request):
         city = City.objects.filter(region_id=region_id).order_by('name').values('id', 'name')
         return JsonResponse(list(city), safe=False)
     return JsonResponse([], safe=False)
+
+class BannedUsersView(TemplateView):
+    template_name = 'banned.html'

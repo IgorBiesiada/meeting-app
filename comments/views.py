@@ -21,4 +21,4 @@ class AddCommentView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('meeting_detail', kwargs={'pk': self.kwargs['meeting_id']})
+        return reverse_lazy('meeting_detail', kwargs={'pk': self.kwargs['meeting_id']}) #bierzemy id spotkania i przekazujemy je do URL widoku
