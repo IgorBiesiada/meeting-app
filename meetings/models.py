@@ -22,4 +22,4 @@ class Meeting(models.Model):
         ratings = self.ratings.all()
         if ratings.exists():
             return ratings.aggregate(Avg('rating'))['rating__avg']
-        return None
+        return 'Brak ocen'

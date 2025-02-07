@@ -1,3 +1,4 @@
+from django import forms
 from django.db import models
 from config import settings
 from meetings.models import Meeting
@@ -10,3 +11,6 @@ class Comment(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     text = models.TextField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('meeting', 'author', 'text')
