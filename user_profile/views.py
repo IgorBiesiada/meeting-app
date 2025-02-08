@@ -33,8 +33,8 @@ class ChangeEmailView(LoginRequiredMixin, UpdateView):
     template_name = 'change_email.html'
     success_url = reverse_lazy('home')
 
-    def get_object(self, queryset=None):
-        obj = super().get_object(queryset)
+    def get_object(self, queryset=None):  #metoda może przyjąć opcjonalny zestaw wyników, ale jeśli nie jest podany, użyje domyślnego.
+        obj = super().get_object(queryset)  #wywołanie orginalnej metody get_boj z klasy nadrzędnej
         if obj != self.request.user:
             raise Http404
         return obj

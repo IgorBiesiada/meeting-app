@@ -9,8 +9,5 @@ from meetings.models import Meeting
 class Comment(models.Model):
     meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    text = models.TextField(max_length=100)
+    text = models.TextField(max_length=100, verbose_name='komentarz')
     created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('meeting', 'author', 'text')

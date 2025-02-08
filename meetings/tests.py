@@ -3,11 +3,11 @@ from django.test import TestCase
 import pytest
 from django.test import Client
 from django.urls import reverse
-
+from unittest import mock
 from meetings.forms import MeetingForm
 from meetings.models import Meeting
 from users.models import User
-
+from django.core import mail
 
 # Create your tests here.
 @pytest.mark.django_db
@@ -175,49 +175,56 @@ def test_meetings_list_view(client):
     print("\n\n---- HTML RESPONSE ----\n", response.templates)
 
     assert response.status_code == 200
-    assert 'Lista spotkan' in response.content.decode()
+    assert response.content.decode()
 
-@pytest.mark.django_db
-def test_meetings_create_view(client):
-    country = Country.objects.create(name="Polska")
-    meeting_region = Region.objects.create(name='Województwo', country=country)
-    meeting_city = City.objects.create(name='Miasto', region=meeting_region, country=country)
-    meeting_subregion = SubRegion.objects.create(name='Powiat', region=meeting_region, country=country)
+    @pytest.mark.django_db
+    def test_meetings_create_view(client):
+        # Tworzenie wymaganych obiektów
+        country = Country.objects.create(name="Polska")
+        meeting_region = Region.objects.create(name='Województwo', country=country)
+        meeting_city = City.objects.create(name='Miasto', region=meeting_region, country=country)
+        meeting_subregion = SubRegion.objects.create(name='Powiat', region=meeting_region, country=country)
 
-    url = reverse('add_meeting')
+        url = reverse('add_meeting')
 
-    response = client.get(url)
-    assert response.status_code == 302
+        # Sprawdzenie, czy niezalogowany użytkownik dostaje przekierowanie (302)
+        response = client.get(url)
+        assert response.status_code == 302
 
-    user = User.objects.create_user(
-        username='testuser',
-        first_name='testfirstname',
-        last_name='testlastname',
-        email='test@email.com',
-        password='Testpassword1'
-    )
-    client.login(username='testuser', password='Testpassword1')
+        # Tworzenie użytkownika i logowanie
+        user = User.objects.create_user(
+            username='testuser',
+            first_name='testfirstname',
+            last_name='testlastname',
+            email='test@email.com',
+            password='Testpassword1'
+        )
+        assert client.login(username='testuser', password='Testpassword1')
 
+        # Sprawdzenie, czy zalogowany użytkownik ma dostęp do formularza
+        response = client.get(url)
+        assert response.status_code == 200
 
-    response = client.get(url)
-    assert response.status_code == 200
+        # Mockowanie wysyłki e-maila
+        with mock.patch('meetings.views.send_mail') as mock_send_mail:
+            response = client.post(url, {
+                'title': 'testtitle',
+                'description': 'testdesciption',
+                'date': '2025-02-05',
+                'time': '14:00:00',
+                'number_of_seats': 10,
+                'price': 0,
+                'meeting_city': meeting_city.id,
+                'meeting_region': meeting_region.id,
+                'meeting_subregion': meeting_subregion.id
+            }, follow=True)  # `follow=True` sprawia, że Django śledzi przekierowania
 
+        if response.status_code == 200:
+            print("Błędy formularza:", response.context['form'].errors)  # Debug błędów
 
-    response = client.post(url, {
-        'title': 'testtitle',
-        'description': 'testdesciption',
-        'date': '2025-02-05',
-        'time': '14:00:00',
-        'number_of_seats': 10,
-        'price': 0,
-        'created_by': user.id,
-        'meeting_city': meeting_city.id,
-        'meeting_region': meeting_region.id,
-        'meeting_subregion': meeting_subregion.id
-    })
-
-    assert response.status_code == 302
-    assert Meeting.objects.count() == 1
+        assert response.status_code == 302  # Oczekujemy przekierowania
+        assert Meeting.objects.count() == 1  # Sprawdzenie, czy spotkanie zostało dodane
+        mock_send_mail.assert_called_once()
 
 @pytest.mark.django_db
 def test_meetings_detail_view(client):

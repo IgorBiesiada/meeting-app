@@ -37,7 +37,8 @@ class CreatePaymentView(View):
         return redirect(checkout_session.url)
 
     def get(self, request, *args, **kwargs):
-        return HttpResponseNotAllowed(['POST'])
+        return HttpResponseNotAllowed(['POST']) #dozwolone tylko żądania POST
+
 
 class PaymentSuccessView(View):
     def get(self, request, *args, **kwargs):
@@ -49,18 +50,18 @@ class PaymentSuccessView(View):
             messages.error(request, 'Musisz być zalogowany, aby dokończyć rejestrację.')
             return redirect('meetings')
 
-        self.add_paid_participant(meeting, user)
-        return redirect('meeting_detail', pk=meeting.id)
+        if meeting.created_by == user:
+            messages.error(request, 'Nie możesz dołączyć do własnego spotkania.')
+            return redirect('meeting_detail', pk=meeting.id)
 
-    def add_paid_participant(self, meeting, user):
         if meeting.number_of_seats > 0:
-            Participation.objects.create(meeting=meeting, participant=user, is_waiting=False)
+            participation, created = Participation.objects.get_or_create(meeting=meeting, participant=user)
             meeting.number_of_seats -= 1
+            participation.save()
             meeting.save()
-            messages.success(self.request, 'Płatność zakończona, dołączyłeś do wydarzenia!')
+            messages.success(request, 'Płatność zakończona, dołączyłeś do wydarzenia!')
         else:
-            Participation.objects.create(meeting=meeting, participant=user, is_waiting=True)
-            meeting.waiting_people += 1
-            meeting.save()
-            messages.success(self.request, 'Płatność zakończona, ale jesteś na liście oczekujących.')
+            messages.error(request, 'Brak miejsc, nie możesz dołączyć.')
+
+        return redirect('meeting_detail', pk=meeting.id)
 
