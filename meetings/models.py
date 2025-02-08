@@ -12,7 +12,6 @@ class Meeting(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Godzina utworzenia wydarzenia')
     number_of_seats = models.IntegerField(default=0, verbose_name='Liczba dostępnych miejsc')
-    waiting_people = models.IntegerField(default=0, verbose_name='Liczba osób oczekujących')
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, default=0, verbose_name='Cena')
     meeting_city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, default=None, verbose_name='Miasto')
     meeting_region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True, default=None, verbose_name='Województwo')

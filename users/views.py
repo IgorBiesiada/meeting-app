@@ -22,9 +22,9 @@ class RegisterUserView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        region_id = self.request.GET.get('region_id')
+        region_id = self.request.GET.get('region_id') #pobieramy region z formularza
         if region_id:
-            context['form'].fields['region'].initial = region_id
+            context['form'].fields['region'].initial = region_id #jesli region istnieje ustawiamy go jako wartość domyslna dla pola region
 
         return context
 

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block title %}{{ meeting.title }}{% endblock %}
 
 {% block container %}
@@ -16,7 +17,6 @@
                 </div>
                 <div class="col-md-6">
                     <h5><i class="bi bi-people"></i> Miejsca: {{ meeting.number_of_seats }}</h5>
-                    <h5><i class="bi bi-hourglass-split"></i> W kolejce: {{ meeting.waiting_people }}</h5>
                 </div>
             </div>
 
@@ -32,59 +32,70 @@
 
             {% if user.is_authenticated %}
                 <div class="mt-4">
-                    {% if meeting.price > 0 %}
-                        {% if is_participant %}
+                    {% if user == meeting.created_by %}
+                        <button class="btn btn-secondary w-100" disabled>Jesteś założycielem spotkania</button>
+                    {% else %}
+                        {% if meeting.price > 0 %}
+                            {% if is_participant %}
+                                <form method="post" action="{% url 'participation' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="meeting_id" value="{{ meeting.id }}">
+                                    <input type="hidden" name="action" value="leave">
+                                    <button type="submit" class="btn btn-danger w-100">Zrezygnuj</button>
+                                </form>
+                            {% elif has_left_paid_meeting %}
+                                <button class="btn btn-secondary w-100" disabled>Nie możesz ponownie dołączyć</button>
+                            {% elif meeting.number_of_seats > 0 %}
+                                <form method="post" action="{% url 'payment' meeting.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="meeting_id" value="{{ meeting.id }}">
+                                    <button type="submit" class="btn btn-primary w-100">Przejdź do płatności</button>
+                                </form>
+                            {% else %}
+                                <button class="btn btn-secondary w-100" disabled>Brak miejsc</button>
+                            {% endif %}
+                        {% else %}
                             <form method="post" action="{% url 'participation' %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="meeting_id" value="{{ meeting.id }}">
-                                <input type="hidden" name="action" value="leave">
-                                <button type="submit" class="btn btn-danger w-100">Zrezygnuj</button>
-                            </form>
-                        {% else %}
-                            <form method="post" action="{% url 'payment' meeting.id %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="meeting_id" value="{{ meeting.id }}">
-                                <button type="submit" class="btn btn-primary w-100">Przejdź do płatności</button>
+                                {% if is_participant %}
+                                    <input type="hidden" name="action" value="leave">
+                                    <button type="submit" class="btn btn-danger w-100">Zrezygnuj</button>
+                                {% elif meeting.number_of_seats > 0 %}
+                                    <input type="hidden" name="action" value="join">
+                                    <button type="submit" class="btn btn-success w-100">Dołącz</button>
+                                {% else %}
+                                    <button class="btn btn-secondary w-100" disabled>Brak miejsc</button>
+                                {% endif %}
                             </form>
                         {% endif %}
-                    {% else %}
-                        <form method="post" action="{% url 'participation' %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="meeting_id" value="{{ meeting.id }}">
-                            {% if is_participant %}
-                                <input type="hidden" name="action" value="leave">
-                                <button type="submit" class="btn btn-danger w-100">Zrezygnuj</button>
-                            {% else %}
-                                <input type="hidden" name="action" value="join">
-                                <button type="submit" class="btn btn-success w-100">Dołącz</button>
-                            {% endif %}
-                        </form>
                     {% endif %}
+                </div>
+            {% endif %}
+
+            <div class="mt-4 text-center">
+                <a href="{% url 'add_comment' meeting.id %}" class="btn btn-outline-secondary">Dodaj komentarz</a>
+            </div>
+
+            {% if comments %}
+                <div class="mt-5 card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Komentarze</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            {% for comment in comments %}
+                                <li class="list-group-item">
+                                    <strong>{{ comment.author.username }}</strong>: {{ comment.text }}
+                                    <br>
+                                    <small class="text-muted">{{ comment.created_at }}</small>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
             {% endif %}
         </div>
     </div>
-    <div class="mt-4 text-center">
-        <a href="{% url 'add_comment' meeting.id %}" class="btn btn-outline-secondary">Dodaj komentarz</a>
-    </div>
-
-    {% if comments %}
-    <div class="mt-5 card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">Komentarze</h4>
-        </div>
-        <div class="card-body">
-            <ul class="list-group">
-                {% for comment in comments %}
-                    <li class="list-group-item">
-                        <strong>{{ comment.author.username }}</strong>: {{ comment.text }}
-                        <br>
-                        <small class="text-muted">{{ comment.created_at }}</small>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

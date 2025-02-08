@@ -8,10 +8,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
-
-<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
 <link rel="stylesheet" href="{% static 'css/map.css' %}">
-
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
 </head>
 <body>
 <div id="map-container">
@@ -19,22 +17,23 @@
     <a href="{% url 'home' %}" class="back-button">Powrót</a>
 </div>
 
-    <script>
-    var map = L.map('map').setView([52.2298, 21.0118], 12);  // Współrzędne dla centralnej Polski
+<script>
+var map = L.map('map').setView([52.2298, 21.0118], 12);
 
-        // Ładowanie OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-        // Dodawanie markerów dla każdego spotkania
-        {% for location in locations %}
-            L.marker([{{ location.lat }}, {{ location.lon }}])  //tworzy marker
-                .addTo(map)     //funkcja dodawania markera na mape
-                .bindPopup("<b>{{ location.title }}</b><br>{{ location.description }}");
-        {% endfor %}
+    var locations = {{ locations|safe }};  // Wstawienie danych JSON
+
+    locations.forEach(function(location) {
+        L.marker([location.lat, location.lon])
+            .addTo(map)
+            .bindPopup("<b>" + location.title + "</b><br>" + location.description);
+    });
+
+    console.log("Dane do mapy:", locations);  // Debugowanie w konsoli
 </script>
-
 
 </body>
 </html>

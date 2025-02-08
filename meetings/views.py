@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.mail import send_mail
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
@@ -8,12 +9,13 @@ from meetings.forms import MeetingForm
 from meetings.models import Meeting
 from django.http import JsonResponse
 from cities_light.models import SubRegion, City
-from geopy.geocoders import Nominatim
-from django.contrib.auth.decorators import login_required
 from participations.models import Participation
-
-
+from config.settings import DEFAULT_FROM_EMAIL, GEOCODING_API_KEY
+from opencage.geocoder import OpenCageGeocode
+from rating.models import Rating
 # Create your views here.
+
+
 
 class MeetingListView(LoginRequiredMixin, ListView):
     model = Meeting
@@ -23,21 +25,21 @@ class MeetingListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         queryset = Meeting.objects.all()
-        query = self.request.GET.get('q', '').strip()
+        query = self.request.GET.get('q', '').strip()   #stripe usuwa spacje na końcu i poczatku. jeśli parametr nie instnieje domyslnie pusty string
         min_price = self.request.GET.get('min_price', '')
         max_price = self.request.GET.get('max_price', '')
         min_number_of_seats = self.request.GET.get('min_number_of_seats', '')
         max_number_of_seats = self.request.GET.get('max_number_of_seats', '')
 
         if query:
-            queryset = queryset.filter(title__icontains=query)
+            queryset = queryset.filter(title__icontains=query)  # icontains zawiera, bez rozróżniania wielkości liter).
 
         if min_price:
             min_price = float(min_price)
-            queryset = queryset.filter(price__gte=min_price)
+            queryset = queryset.filter(price__gte=min_price)    #get większe lub równe
         if max_price:
             max_price = float(max_price)
-            queryset = queryset.filter(price__lte=max_price)
+            queryset = queryset.filter(price__lte=max_price)    #lte mniejsze lub równe
 
         if min_number_of_seats:
             min_number_of_seats = int(min_number_of_seats)
@@ -48,6 +50,19 @@ class MeetingListView(LoginRequiredMixin, ListView):
 
         return queryset
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        meetings = context['meetings']
+        user = self.request.user    #pobieranie aktualnego zalogowanego uzytkonika
+
+        user_ratings = {
+            meeting.id: Rating.objects.filter(meeting=meeting, user=self.request.user).exists()
+            for meeting in meetings
+        }
+
+        context['user_ratings'] = user_ratings  #dodajemy do kontekstu
+        return context
+
 class MeetingAddView(LoginRequiredMixin, CreateView):
     model = Meeting
     form_class = MeetingForm
@@ -56,7 +71,19 @@ class MeetingAddView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        self.send_mail(self.request.user.email)
+        return response
+
+    def send_mail(self, user_mail):
+        send_mail(
+            'let s meet',
+            'Właśnie utworzyłeś spotkanie!!!! Gratulacje!!!!',
+            DEFAULT_FROM_EMAIL,
+            [user_mail],
+            fail_silently=False
+        )
+
 
 class MeetingDetailView(LoginRequiredMixin, DetailView):
     model = Meeting
@@ -73,15 +100,17 @@ class MeetingDetailView(LoginRequiredMixin, DetailView):
 
 class MeetingUpdateView(LoginRequiredMixin, UpdateView):
     model = Meeting
-    fields = ['title', 'description', 'date', 'time', 'number_of_seats', 'price']
     template_name = 'meeting_edit.html'
     success_url = reverse_lazy('meetings')
+    form_class = MeetingForm
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
         if obj.created_by != self.request.user:
             raise PermissionDenied
         return obj
+
+
 
 class DeleteMeetingView(LoginRequiredMixin, DeleteView):
     model = Meeting
@@ -118,28 +147,21 @@ def get_meeting_city(request):
         return JsonResponse(list(cities), safe=False)
     return JsonResponse([], safe=False)
 
-@login_required
+
 def meetings_map_view(request):
-    geolocator = Nominatim(user_agent="myapp")
+    geocoder = OpenCageGeocode(GEOCODING_API_KEY)
 
     meetings = Meeting.objects.all()
     locations = []
 
     for meeting in meetings:
-        if meeting.meeting_city:
-            city_name = meeting.meeting_city.name
-            try:
-                location = geolocator.geocode(city_name)
-                if location:
-                    locations.append({
-                        'title': meeting.title,
-                        'lat': location.latitude,  # Szerokość geograficzna
-                        'lon': location.longitude,  # Długość geograficzna
-                        'description': meeting.description,
-                    })
-            except Exception as e:
-                print(f"Błąd podczas geokodowania {city_name}: {e}")
-                continue
+        if meeting.meeting_city and meeting.meeting_city.latitude and meeting.meeting_city.longitude:
+            locations.append({
+                'title': meeting.title,
+                'lat': float(meeting.meeting_city.latitude),  # Pobranie szerokości geograficznej
+                'lon': float(meeting.meeting_city.longitude),  # Pobranie długości geograficznej
+                'description': meeting.description,
+            })
 
     context = {
             'locations': locations,

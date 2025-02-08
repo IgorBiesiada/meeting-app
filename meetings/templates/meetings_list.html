@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load custom_filters %}
 {% block title %}meetings{% endblock %}
 
 {% block container %}
@@ -58,15 +58,13 @@
             <a href="{% url 'meeting_edit' meeting.id %}" class="btn btn-primary me-2 mb-2">Edytuj</a>
             <a href="{% url 'meeting_delete' meeting.id %}" class="btn btn-primary me-2 mb-2">Usuń</a>
         {% endif %}
-        {% with user_rating=meeting.ratings.all|dictsortreversed:"id"|first %}
-            {% if request.user != user_rating.user %}
-                {% if not user_rating and request.user != meeting.created_by %}
-                <a href="{% url 'rating' meeting.id %}" class="btn btn-primary me-2 mb-2">Zostaw ocenę</a>
-                {% endif %}
-        {% else %}
+        {% if user_ratings|dict_get:meeting.id %}
             <p>Dziękujemy za ocenę!🙂</p>
+
+        {% else %}
+            <a href="{% url 'rating' meeting.id %}" class="btn btn-primary me-2 mb-2">Zostaw ocenę</a>
         {% endif %}
-        {% endwith %}
+
         </div>
 </div>
 {% endfor %}
