@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 from django.core.exceptions import PermissionDenied
 from comments.models import Comment
-from meetings.forms import MeetingForm
+from meetings.forms import MeetingForm, MeetingEditForm
 from meetings.models import Meeting
 from django.http import JsonResponse
 from cities_light.models import SubRegion, City
@@ -102,7 +102,7 @@ class MeetingUpdateView(LoginRequiredMixin, UpdateView):
     model = Meeting
     template_name = 'meeting_edit.html'
     success_url = reverse_lazy('meetings')
-    form_class = MeetingForm
+    form_class = MeetingEditForm
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)

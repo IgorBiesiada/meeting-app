@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from users.models import User
 from django import forms
+from untils import contains_bad_words, analyze_toxicity
 
 class UserUpdateEmailForm(forms.ModelForm):
     email = forms.EmailField(max_length=150, required=True)
@@ -25,6 +26,12 @@ class UserUpdateUsernameForm(forms.ModelForm):
 
         if self.instance and self.instance.username == event_username:
             raise forms.ValidationError('Nowa nazwa użytkownika musi być inna niż aktualna')
+
+        if contains_bad_words(event_username):
+            raise forms.ValidationError("Nazwa użytkownika zawiera nieodpowiednie słowa")
+
+        if analyze_toxicity(event_username):
+            raise forms.ValidationError("Nazwa jest toksyczna lub nieodpowiednia")
 
         return event_username
 

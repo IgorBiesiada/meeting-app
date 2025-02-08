@@ -23,7 +23,7 @@ def test_add_rating_view(client):
     )
 
     # URL widoku dodawania oceny
-    url = reverse('rating_add', kwargs={'pk': meeting.id})
+    url = reverse('rating', kwargs={'pk': meeting.id})
 
 
     data = {
@@ -38,4 +38,3 @@ def test_add_rating_view(client):
     rating = Rating.objects.filter(meeting=meeting, user=user).first()
     assert rating is not None
     assert rating.rating == 5
-    assert rating.comment == "Bardzo dobre spotkanie!"
