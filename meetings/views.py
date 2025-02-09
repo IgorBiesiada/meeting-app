@@ -15,7 +15,7 @@ from opencage.geocoder import OpenCageGeocode
 from rating.models import Rating
 # Create your views here.
 
-
+#wakacje123
 
 class MeetingListView(LoginRequiredMixin, ListView):
     model = Meeting
