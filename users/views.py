@@ -52,7 +52,7 @@ class CustomLoginUserView(LoginView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('home')
+        return reverse_lazy('home:home')
 
 class HomeBeforeLoginView(TemplateView):
     template_name = 'landing_page.html'

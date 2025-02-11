@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
 from django.shortcuts import render
@@ -168,3 +169,13 @@ def meetings_map_view(request):
             }
 
     return render(request, 'map.html', context)
+
+class OutdatedMeetingsListView(LoginRequiredMixin, ListView):
+    model = Meeting
+    context_object_name = 'meetings'
+    template_name = 'meetings_outdated_list.html'
+
+    def get_queryset(self):
+        now = timezone.now()
+        outdated_meeting = Meeting.objects.filter(date__lt=now)
+        return outdated_meeting
