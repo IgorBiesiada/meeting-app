@@ -31,7 +31,7 @@ class ChangeEmailView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = UserUpdateEmailForm
     template_name = 'change_email.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('home:home')
 
     def get_object(self, queryset=None):  #metoda może przyjąć opcjonalny zestaw wyników, ale jeśli nie jest podany, użyje domyślnego.
         obj = super().get_object(queryset)  #wywołanie orginalnej metody get_boj z klasy nadrzędnej
@@ -55,7 +55,7 @@ class ChangeUsernameView(LoginRequiredMixin,UpdateView):
     model = User
     form_class = UserUpdateUsernameForm
     template_name = 'change_username.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('home:home')
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
@@ -79,4 +79,4 @@ class ChangePasswordView(LoginRequiredMixin, PasswordChangeView):
     model = User
     form_class = PasswordChangeForm
     template_name = 'change_password.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('home:home')

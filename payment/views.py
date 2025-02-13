@@ -63,5 +63,5 @@ class PaymentSuccessView(View):
         else:
             messages.error(request, 'Brak miejsc, nie możesz dołączyć.')
 
-        return redirect('meeting_detail', pk=meeting.id)
+        return redirect('meetings:meeting_detail', pk=meeting.id)
 

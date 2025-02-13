@@ -16,7 +16,6 @@ from opencage.geocoder import OpenCageGeocode
 from rating.models import Rating
 # Create your views here.
 
-#wakacje123
 
 class MeetingListView(LoginRequiredMixin, ListView):
     model = Meeting
@@ -68,7 +67,7 @@ class MeetingAddView(LoginRequiredMixin, CreateView):
     model = Meeting
     form_class = MeetingForm
     template_name = 'add_meeting.html'
-    success_url = reverse_lazy('meetings')
+    success_url = reverse_lazy('meetings:meetings')
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -102,7 +101,7 @@ class MeetingDetailView(LoginRequiredMixin, DetailView):
 class MeetingUpdateView(LoginRequiredMixin, UpdateView):
     model = Meeting
     template_name = 'meeting_edit.html'
-    success_url = reverse_lazy('meetings')
+    success_url = reverse_lazy('meetings:meetings')
     form_class = MeetingEditForm
 
     def get_object(self, queryset=None):
@@ -116,7 +115,7 @@ class MeetingUpdateView(LoginRequiredMixin, UpdateView):
 class DeleteMeetingView(LoginRequiredMixin, DeleteView):
     model = Meeting
     template_name = 'meeting_confirm_delete.html'
-    success_url = reverse_lazy('meetings')
+    success_url = reverse_lazy('meetings:meetings')
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)

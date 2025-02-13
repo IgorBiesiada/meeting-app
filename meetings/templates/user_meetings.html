@@ -12,8 +12,8 @@
         <div class="card-body">
         <h5 class="card-title">{{ meeting.date }}</h5>
         <p class="card-text">{{ meeting.time }}</p>
-            <a href="{% url 'meeting_edit' meeting.id %}" class="btn btn-primary me-2 mb-2">Edytuj</a>
-            <a href="{% url 'meeting_delete' meeting.id %}" class="btn btn-primary me-2 mb-2">Usuń</a>
+            <a href="{% url 'meetings:meeting_edit' meeting.id %}" class="btn btn-primary me-2 mb-2">Edytuj</a>
+            <a href="{% url 'meetings:meeting_delete' meeting.id %}" class="btn btn-primary me-2 mb-2">Usuń</a>
   </div>
 </div>
     {% endfor %}

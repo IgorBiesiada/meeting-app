@@ -52,4 +52,4 @@ class MeetingParticipationView(LoginRequiredMixin, View):
             meeting.save()  # Zapisuje zmiany
             messages.success(request, 'Opuszczono spotkanie. Zwolniło się miejsce!')  # Wyświetla komunikat
 
-        return redirect('meeting_detail', pk=meeting.id)  # Przekierowanie na stronę szczegółów spotkania
+        return redirect('meetings:meeting_detail', pk=meeting.id)  # Przekierowanie na stronę szczegółów spotkania
