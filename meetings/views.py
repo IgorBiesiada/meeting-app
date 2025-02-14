@@ -24,7 +24,8 @@ class MeetingListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        queryset = Meeting.objects.all()
+        date = timezone.now()
+        queryset = Meeting.objects.filter(date__gte=date)
         query = self.request.GET.get('q', '').strip()   #stripe usuwa spacje na końcu i poczatku. jeśli parametr nie instnieje domyslnie pusty string
         min_price = self.request.GET.get('min_price', '')
         max_price = self.request.GET.get('max_price', '')
@@ -50,18 +51,6 @@ class MeetingListView(LoginRequiredMixin, ListView):
 
         return queryset
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        meetings = context['meetings']
-        user = self.request.user    #pobieranie aktualnego zalogowanego uzytkonika
-
-        user_ratings = {
-            meeting.id: Rating.objects.filter(meeting=meeting, user=self.request.user).exists()
-            for meeting in meetings
-        }
-
-        context['user_ratings'] = user_ratings  #dodajemy do kontekstu
-        return context
 
 class MeetingAddView(LoginRequiredMixin, CreateView):
     model = Meeting
@@ -178,3 +167,16 @@ class OutdatedMeetingsListView(LoginRequiredMixin, ListView):
         now = timezone.now()
         outdated_meeting = Meeting.objects.filter(date__lt=now)
         return outdated_meeting
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        meetings = context['meetings']
+        user = self.request.user  # pobieranie aktualnego zalogowanego uzytkonika
+
+        user_ratings = {
+            meeting.id: Rating.objects.filter(meeting=meeting, user=self.request.user).exists()
+            for meeting in meetings
+        }
+
+        context['user_ratings'] = user_ratings  # dodajemy do kontekstu
+        return context
