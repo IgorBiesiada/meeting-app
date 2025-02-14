@@ -22,4 +22,4 @@ class AddCommentView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 #przekierowanie uzytkonika po zapisie danych
     def get_success_url(self):
-        return reverse_lazy('meeting_detail', kwargs={'pk': self.kwargs['meeting_id']}) #bierzemy id spotkania i przekazujemy je do URL widoku
+        return reverse_lazy('meetings:meeting_detail', kwargs={'pk': self.kwargs['meeting_id']}) #bierzemy id spotkania i przekazujemy je do URL widoku

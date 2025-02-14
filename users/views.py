@@ -48,11 +48,11 @@ class CustomLoginUserView(LoginView):
     def form_valid(self, form):
         user = form.get_user()
         if user.is_baned:
-            return redirect(reverse_lazy('banned'))
+            return redirect(reverse_lazy('users:banned'))
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('home')
+        return reverse_lazy('home:home')
 
 class HomeBeforeLoginView(TemplateView):
     template_name = 'landing_page.html'

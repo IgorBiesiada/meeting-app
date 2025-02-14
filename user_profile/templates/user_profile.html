@@ -17,10 +17,10 @@
             </ul>
 
             <div class="d-grid gap-2 mt-4">
-                <a href="{% url 'change_mail' user.id %}" class="btn btn-outline-primary">Zmień e-mail</a>
-                <a href="{% url 'change_username' user.id %}" class="btn btn-outline-success">Zmień nazwę</a>
-                <a href="{% url 'change_password' user.id %}" class="btn btn-outline-danger">Zmień hasło</a>
-                <a href="{% url 'home' %}" class="btn btn-secondary">Strona główna</a>
+                <a href="{% url 'user_profile:change_mail' user.id %}" class="btn btn-outline-primary">Zmień e-mail</a>
+                <a href="{% url 'user_profile:change_username' user.id %}" class="btn btn-outline-success">Zmień nazwę</a>
+                <a href="{% url 'user_profile:change_password' user.id %}" class="btn btn-outline-danger">Zmień hasło</a>
+                <a href="{% url 'home:home' %}" class="btn btn-secondary">Strona główna</a>
                 <form method="POST" action="{% url 'logout' %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-outline-danger">Wyloguj się</button>

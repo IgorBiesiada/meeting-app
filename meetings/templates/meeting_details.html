@@ -37,7 +37,7 @@
                     {% else %}
                         {% if meeting.price > 0 %}
                             {% if is_participant %}
-                                <form method="post" action="{% url 'participation' %}">
+                                <form method="post" action="{% url 'participations:participation' %}">
                                     {% csrf_token %}
                                     <input type="hidden" name="meeting_id" value="{{ meeting.id }}">
                                     <input type="hidden" name="action" value="leave">
@@ -46,7 +46,7 @@
                             {% elif has_left_paid_meeting %}
                                 <button class="btn btn-secondary w-100" disabled>Nie możesz ponownie dołączyć</button>
                             {% elif meeting.number_of_seats > 0 %}
-                                <form method="post" action="{% url 'payment' meeting.id %}">
+                                <form method="post" action="{% url 'payment:payment' meeting.id %}">
                                     {% csrf_token %}
                                     <input type="hidden" name="meeting_id" value="{{ meeting.id }}">
                                     <button type="submit" class="btn btn-primary w-100">Przejdź do płatności</button>
@@ -55,7 +55,7 @@
                                 <button class="btn btn-secondary w-100" disabled>Brak miejsc</button>
                             {% endif %}
                         {% else %}
-                            <form method="post" action="{% url 'participation' %}">
+                            <form method="post" action="{% url 'participations:participation' %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="meeting_id" value="{{ meeting.id }}">
                                 {% if is_participant %}
@@ -74,7 +74,7 @@
             {% endif %}
 
             <div class="mt-4 text-center">
-                <a href="{% url 'add_comment' meeting.id %}" class="btn btn-outline-secondary">Dodaj komentarz</a>
+                <a href="{% url 'comments:add_comment' meeting.id %}" class="btn btn-outline-secondary">Dodaj komentarz</a>
             </div>
 
             {% if comments %}

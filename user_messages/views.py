@@ -10,7 +10,7 @@ class UserMessagesView(LoginRequiredMixin, CreateView):
     model = Message
     form_class = MessageForm
     template_name = 'messages.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('home:home')
 
     def form_valid(self, form):
         form.instance.sender = self.request.user

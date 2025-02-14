@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block title %}meetings{% endblock %}
+
+{% block container %}
+
+{% for meeting in meetings %}
+
+    <div class="card mb-3">
+    <h5 class="card-header">{{ meeting.title }}</h5>
+        <div class="card-body">
+        <h5 class="card-title">{{ meeting.date }}</h5>
+        {% if meeting.ratings %}
+            <p class="card-text">{{ meeting.get_average_rating }} ⭐</p>
+        {% endif %}
+            <a href="{% url 'meetings:meeting_detail' meeting.id %}" class="btn btn-primary me-2 mb-2">Szczegóły</a>
+        {% if request.user == meeting.created_by %}
+            <a href="{% url 'meetings:meeting_edit' meeting.id %}" class="btn btn-primary me-2 mb-2">Edytuj</a>
+            <a href="{% url 'meetings:meeting_delete' meeting.id %}" class="btn btn-primary me-2 mb-2">Usuń</a>
+        {% endif %}
+        {% if user_ratings|dict_get:meeting.id %}
+            <p>Dziękujemy za ocenę!🙂</p>
+
+        {% else %}
+            <a href="{% url 'rating:rating' meeting.id %}" class="btn btn-primary me-2 mb-2">Zostaw ocenę</a>
+        {% endif %}
+
+        </div>
+</div>
+{% endfor %}
+{% endblock %}

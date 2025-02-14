@@ -2,32 +2,35 @@
 
 <nav class="navbar navbar-expand-lg bg-body-tertiary text-bg-dark p-3">
   <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'home' %}">Home</a>
+    <a class="navbar-brand" href="{% url 'home:home' %}">Home</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="{% url 'meetings' %}">Spotkania</a>
+          <a class="nav-link active" aria-current="page" href="{% url 'meetings:meetings' %}">Spotkania</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'user_meetings' %}">Moje spotkania</a>
+          <a class="nav-link" href="{% url 'meetings:user_meetings' %}">Moje spotkania</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'add_meeting' %}">Zaplanuj spotkanie</a>
+          <a class="nav-link" href="{% url 'meetings:add_meeting' %}">Zaplanuj spotkanie</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'meetings_map' %}">mapa spotkań</a>
+          <a class="nav-link" href="{% url 'meetings:meetings_map' %}">mapa spotkań</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'messages' %}">Napisz wiadomość</a>
+          <a class="nav-link" href="{% url 'user_messages:messages' %}">Napisz wiadomość</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'user_profile' user.id %}">Profil</a>
+          <a class="nav-link" href="{% url 'user_profile:user_profile' user.id %}">Profil</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'user_messages' %}">Wiadomości do ciebie</a>
+          <a class="nav-link" href="{% url 'user_messages:user_messages' %}">Wiadomości do ciebie</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'meetings:outdated_meetings' %}">Spotkania które się odbyły</a>
         </li>
       </ul>
     </div>

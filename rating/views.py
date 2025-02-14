@@ -21,4 +21,4 @@ class RatingAddView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('meetings')
+        return reverse_lazy('meetings:meetings')

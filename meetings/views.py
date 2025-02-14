@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
 from django.shortcuts import render
@@ -15,7 +16,6 @@ from opencage.geocoder import OpenCageGeocode
 from rating.models import Rating
 # Create your views here.
 
-#wakacje123
 
 class MeetingListView(LoginRequiredMixin, ListView):
     model = Meeting
@@ -24,7 +24,8 @@ class MeetingListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        queryset = Meeting.objects.all()
+        date = timezone.now()
+        queryset = Meeting.objects.filter(date__gte=date)
         query = self.request.GET.get('q', '').strip()   #stripe usuwa spacje na końcu i poczatku. jeśli parametr nie instnieje domyslnie pusty string
         min_price = self.request.GET.get('min_price', '')
         max_price = self.request.GET.get('max_price', '')
@@ -50,24 +51,12 @@ class MeetingListView(LoginRequiredMixin, ListView):
 
         return queryset
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        meetings = context['meetings']
-        user = self.request.user    #pobieranie aktualnego zalogowanego uzytkonika
-
-        user_ratings = {
-            meeting.id: Rating.objects.filter(meeting=meeting, user=self.request.user).exists()
-            for meeting in meetings
-        }
-
-        context['user_ratings'] = user_ratings  #dodajemy do kontekstu
-        return context
 
 class MeetingAddView(LoginRequiredMixin, CreateView):
     model = Meeting
     form_class = MeetingForm
     template_name = 'add_meeting.html'
-    success_url = reverse_lazy('meetings')
+    success_url = reverse_lazy('meetings:meetings')
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -101,7 +90,7 @@ class MeetingDetailView(LoginRequiredMixin, DetailView):
 class MeetingUpdateView(LoginRequiredMixin, UpdateView):
     model = Meeting
     template_name = 'meeting_edit.html'
-    success_url = reverse_lazy('meetings')
+    success_url = reverse_lazy('meetings:meetings')
     form_class = MeetingEditForm
 
     def get_object(self, queryset=None):
@@ -115,7 +104,7 @@ class MeetingUpdateView(LoginRequiredMixin, UpdateView):
 class DeleteMeetingView(LoginRequiredMixin, DeleteView):
     model = Meeting
     template_name = 'meeting_confirm_delete.html'
-    success_url = reverse_lazy('meetings')
+    success_url = reverse_lazy('meetings:meetings')
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
@@ -168,3 +157,26 @@ def meetings_map_view(request):
             }
 
     return render(request, 'map.html', context)
+
+class OutdatedMeetingsListView(LoginRequiredMixin, ListView):
+    model = Meeting
+    context_object_name = 'meetings'
+    template_name = 'meetings_outdated_list.html'
+
+    def get_queryset(self):
+        now = timezone.now()
+        outdated_meeting = Meeting.objects.filter(date__lt=now)
+        return outdated_meeting
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        meetings = context['meetings']
+        user = self.request.user  # pobieranie aktualnego zalogowanego uzytkonika
+
+        user_ratings = {
+            meeting.id: Rating.objects.filter(meeting=meeting, user=self.request.user).exists()
+            for meeting in meetings
+        }
+
+        context['user_ratings'] = user_ratings  # dodajemy do kontekstu
+        return context
