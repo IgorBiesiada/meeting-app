@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'users',
     'home',
     'meetings',
@@ -55,11 +56,21 @@ INSTALLED_APPS = [
     'rating',
 
     'crispy_forms',
-    'crispy_bootstrap5'
+    'crispy_bootstrap5',
+    
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.discord',
+    
 ]
 
 AUTH_USER_MODEL = 'users.User'
 
+AUTHENTICATION_BACKENDS = [
+    'allauth.account.auth_backends.AuthenticationBackend'
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -69,7 +80,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+    'allauth.account.middleware.AccountMiddleware'
+    ]
 
 ROOT_URLCONF = 'config.urls'
 
@@ -88,6 +100,30 @@ TEMPLATES = [
         },
     },
 ]
+
+SOCIALACCOUNT_PROVIDERS = {
+    
+    "github": {
+        "APP": {
+                "client_id": os.environ.get('GITHUB_CLIENT_ID'),
+                "secret": os.environ.get('GITHUB_CLIENT_SECRETS'),
+                "key": ""
+            }
+    },
+
+    "discord": {
+        "APP": {
+            "client_id": os.environ.get('DISCORD_CLIENT_ID'),
+            "secret": os.environ.get('DISCORD_CLIENT_SECRETS'),
+            "key": ""
+        }
+    }
+
+}
+
+SITE_ID = 1
+
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
