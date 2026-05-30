@@ -9,6 +9,5 @@ urlpatterns = [
     path('', HomeBeforeLoginView.as_view(), name='landing_page'),
     path('banned/', BannedUsersView.as_view(), name='banned'),
     path('get_city/', get_city, name='get_city'),
-    path('logout_redirect/', LogoutUserView.as_view(), name='logout_redirect'),
-    path('accounts/', include('allauth.urls'))
+    path('logout_redirect/', LogoutUserView.as_view(), name='logout_redirect')
 ]
