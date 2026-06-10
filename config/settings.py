@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.discord',
+    'rest_framework',
     
 ]
 
