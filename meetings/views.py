@@ -14,15 +14,17 @@ from participations.models import Participation
 from config.settings import DEFAULT_FROM_EMAIL, GEOCODING_API_KEY
 from opencage.geocoder import OpenCageGeocode
 from rating.models import Rating
+from rest_framework import generics
+from meetings.serializers import MeetingSerializer
+from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 
 
-class MeetingListView(LoginRequiredMixin, ListView):
-    model = Meeting
-    template_name = 'meetings_list.html'
-    context_object_name = 'meetings'
-    paginate_by = 20
-
+class MeetingListView(generics.ListAPIView):
+    model = Meeting.objects.all()
+    serializer_class = MeetingSerializer
+    permission_classes = [IsAuthenticated]
+    
     def get_queryset(self):
         date = timezone.now()
         queryset = Meeting.objects.filter(date__gte=date)
@@ -52,18 +54,15 @@ class MeetingListView(LoginRequiredMixin, ListView):
         return queryset
 
 
-class MeetingAddView(LoginRequiredMixin, CreateView):
-    model = Meeting
-    form_class = MeetingForm
-    template_name = 'add_meeting.html'
-    success_url = reverse_lazy('meetings:meetings')
+class MeetingAddView(generics.CreateAPIView):
+    model = Meeting.objects.all()
+    serializer_class = MeetingSerializer
+    permission_classes = [IsAuthenticated]
 
-    def form_valid(self, form):
-        form.instance.created_by = self.request.user
-        response = super().form_valid(form)
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
         self.send_mail(self.request.user.email)
-        return response
-
+        
     def send_mail(self, user_mail):
         send_mail(
             'let s meet',
@@ -74,18 +73,12 @@ class MeetingAddView(LoginRequiredMixin, CreateView):
         )
 
 
-class MeetingDetailView(LoginRequiredMixin, DetailView):
-    model = Meeting
-    template_name = 'meeting_details.html'
+class MeetingDetailView(generics.RetrieveAPIView):
+    model = Meeting.objects.all()
+    serializer_class = MeetingSerializer
+    permission_classes = [IsAuthenticated]
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-        context['comments'] = Comment.objects.filter(meeting=self.object)
-
-        context['is_participant'] = Participation.objects.filter(meeting=self.object, participant=user).exists()
-
-        return context
+    
 
 class MeetingUpdateView(LoginRequiredMixin, UpdateView):
     model = Meeting
