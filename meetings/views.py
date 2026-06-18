@@ -1,12 +1,6 @@
 from django.utils import timezone
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
 from django.shortcuts import render
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
-from django.core.exceptions import PermissionDenied
-from comments.models import Comment
-from meetings.forms import MeetingForm, MeetingEditForm
 from meetings.models import Meeting
 from django.http import JsonResponse
 from cities_light.models import SubRegion, City
@@ -17,6 +11,8 @@ from rating.models import Rating
 from rest_framework import generics
 from meetings.serializers import MeetingSerializer
 from rest_framework.permissions import IsAuthenticated
+from meetings.permissions import IsOwner
+from rest_framework.decorators import api_view
 # Create your views here.
 
 
@@ -80,43 +76,30 @@ class MeetingDetailView(generics.RetrieveAPIView):
 
     
 
-class MeetingUpdateView(LoginRequiredMixin, UpdateView):
-    model = Meeting
-    template_name = 'meeting_edit.html'
-    success_url = reverse_lazy('meetings:meetings')
-    form_class = MeetingEditForm
-
-    def get_object(self, queryset=None):
-        obj = super().get_object(queryset)
-        if obj.created_by != self.request.user:
-            raise PermissionDenied
-        return obj
+class MeetingUpdateView(generics.RetrieveUpdateAPIView):
+    model = Meeting.objects.all()
+    serializer_class = MeetingSerializer
+    permission_classes = [IsAuthenticated, IsOwner]
 
 
 
-class DeleteMeetingView(LoginRequiredMixin, DeleteView):
-    model = Meeting
-    template_name = 'meeting_confirm_delete.html'
-    success_url = reverse_lazy('meetings:meetings')
+class DeleteMeetingView(generics.RetrieveDestroyAPIView):
+    model = Meeting.objects.all()
+    serializer_class = MeetingSerializer
+    permission_classes = [IsAuthenticated, IsOwner]
 
-    def get_object(self, queryset=None):
-        obj = super().get_object(queryset)
-        if obj.created_by != self.request.user:
-            raise PermissionDenied
-        return obj
-
-class UserMeetingListView(LoginRequiredMixin, ListView):
-    model = Meeting
-    template_name = 'user_meetings.html'
-    context_object_name = 'meetings'
-    paginate_by = 20
+class UserMeetingListView(generics.ListAPIView):
+    model = Meeting.objects.all()
+    serializer_class = MeetingSerializer
+    permission_classes = [IsAuthenticated, IsOwner]
 
     def get_queryset(self):
-        qs = Meeting.objects.filter(created_by=self.request.user)
-        return qs
+        queryset = Meeting.objects.filter(created_by=self.request.user)
+        return queryset
 
+@api_view(['GET'])
 def get_meeting_subregion(request):
-    region_id = request.GET.get('region_id')
+    region_id = request.query_params.get('region_id')
     if region_id:
         subregion = SubRegion.objects.filter(region_id=region_id).order_by('name').values('id', 'name')
         return JsonResponse(list(subregion), safe=False)
@@ -151,10 +134,10 @@ def meetings_map_view(request):
 
     return render(request, 'map.html', context)
 
-class OutdatedMeetingsListView(LoginRequiredMixin, ListView):
-    model = Meeting
-    context_object_name = 'meetings'
-    template_name = 'meetings_outdated_list.html'
+class OutdatedMeetingsListView(generics.ListAPIView):
+    model = Meeting.objects.all()
+    serializer_class = MeetingSerializer
+    permission_classe = [IsAuthenticated]
 
     def get_queryset(self):
         now = timezone.now()
