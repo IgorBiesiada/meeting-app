@@ -4,41 +4,42 @@ from django.shortcuts import render
 from meetings.models import Meeting
 from django.http import JsonResponse
 from cities_light.models import SubRegion, City
-from participations.models import Participation
 from config.settings import DEFAULT_FROM_EMAIL, GEOCODING_API_KEY
 from opencage.geocoder import OpenCageGeocode
 from rating.models import Rating
 from rest_framework import generics
 from meetings.serializers import MeetingSerializer
-from rest_framework.permissions import IsAuthenticated
-from meetings.permissions import IsOwner
+from rest_framework import permissions  
+from meetings.permissions import IsOwnerOrReadOnly
 from rest_framework.decorators import api_view
+from rest_framework import viewsets
+from rest_framework.decorators import action
 # Create your views here.
 
 
-class MeetingListView(generics.ListAPIView):
-    model = Meeting.objects.all()
+class MeetingViewSet(viewsets.ModelViewSet):
+    queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
-    permission_classes = [IsAuthenticated]
-    
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+
     def get_queryset(self):
         date = timezone.now()
         queryset = Meeting.objects.filter(date__gte=date)
-        query = self.request.GET.get('q', '').strip()   #stripe usuwa spacje na końcu i poczatku. jeśli parametr nie instnieje domyslnie pusty string
+        query = self.request.GET.get('q', '').strip()   
         min_price = self.request.GET.get('min_price', '')
         max_price = self.request.GET.get('max_price', '')
         min_number_of_seats = self.request.GET.get('min_number_of_seats', '')
         max_number_of_seats = self.request.GET.get('max_number_of_seats', '')
 
         if query:
-            queryset = queryset.filter(title__icontains=query)  # icontains zawiera, bez rozróżniania wielkości liter).
+            queryset = queryset.filter(title__icontains=query)  
 
         if min_price:
             min_price = float(min_price)
-            queryset = queryset.filter(price__gte=min_price)    #get większe lub równe
+            queryset = queryset.filter(price__gte=min_price)    
         if max_price:
             max_price = float(max_price)
-            queryset = queryset.filter(price__lte=max_price)    #lte mniejsze lub równe
+            queryset = queryset.filter(price__lte=max_price)    
 
         if min_number_of_seats:
             min_number_of_seats = int(min_number_of_seats)
@@ -48,17 +49,11 @@ class MeetingListView(generics.ListAPIView):
             queryset = queryset.filter(number_of_seats__lte=max_number_of_seats)
 
         return queryset
-
-
-class MeetingAddView(generics.CreateAPIView):
-    model = Meeting.objects.all()
-    serializer_class = MeetingSerializer
-    permission_classes = [IsAuthenticated]
-
+    
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
         self.send_mail(self.request.user.email)
-        
+
     def send_mail(self, user_mail):
         send_mail(
             'let s meet',
@@ -68,34 +63,12 @@ class MeetingAddView(generics.CreateAPIView):
             fail_silently=False
         )
 
+    @action(detail=False, methods=['get'])
+    def my_meetings(self, request):
+        queryset = Meeting.objects.filter(created_by=request.user)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
-class MeetingDetailView(generics.RetrieveAPIView):
-    model = Meeting.objects.all()
-    serializer_class = MeetingSerializer
-    permission_classes = [IsAuthenticated]
-
-    
-
-class MeetingUpdateView(generics.RetrieveUpdateAPIView):
-    model = Meeting.objects.all()
-    serializer_class = MeetingSerializer
-    permission_classes = [IsAuthenticated, IsOwner]
-
-
-
-class DeleteMeetingView(generics.RetrieveDestroyAPIView):
-    model = Meeting.objects.all()
-    serializer_class = MeetingSerializer
-    permission_classes = [IsAuthenticated, IsOwner]
-
-class UserMeetingListView(generics.ListAPIView):
-    model = Meeting.objects.all()
-    serializer_class = MeetingSerializer
-    permission_classes = [IsAuthenticated, IsOwner]
-
-    def get_queryset(self):
-        queryset = Meeting.objects.filter(created_by=self.request.user)
-        return queryset
 
 @api_view(['GET'])
 def get_meeting_subregion(request):

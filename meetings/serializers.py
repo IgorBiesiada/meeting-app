@@ -8,7 +8,6 @@ class MeetingSerializer(serializers.serializer):
               'number_of_seats', 'price', 'meeting_city', 'meeting_region', 'meeting_subregion']
     
     def get_is_participant(self, obj):
-        # DRF domyślnie podrzuca request do kontekstu serializera
         request = self.context.get('request')
         if request and request.user.is_authenticated:
              return Participation.objects.filter(meeting=obj, participant=request.user).exists()

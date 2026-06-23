@@ -1,25 +1,21 @@
-from django.urls import path
-from meetings.views import (MeetingListView,
-                            MeetingAddView,
-                            MeetingDetailView,
-                            MeetingUpdateView,
-                            DeleteMeetingView,
-                            UserMeetingListView,
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from meetings.views import (MeetingViewSet, 
                             get_meeting_subregion,
                             get_meeting_city,
                             meetings_map_view,
                             OutdatedMeetingsListView
                             )
 
+router = DefaultRouter()
+
+
 app_name = 'meetings'
 
+router.register(r'meetings', MeetingViewSet, basename='meeting')
+
 urlpatterns = [
-    path('meetings/', MeetingListView.as_view(), name='meetings'),
-    path('add_meeting/', MeetingAddView.as_view(), name='add_meeting'),
-    path('<int:pk>/meeting_detail/', MeetingDetailView.as_view(), name='meeting_detail'),
-    path('<int:pk>', MeetingUpdateView.as_view(), name='meeting_edit'),
-    path('<int:pk>/delete/', DeleteMeetingView.as_view(), name='meeting_delete'),
-    path('user_meetings/', UserMeetingListView.as_view(), name='user_meetings'),
+    path('api/', include(router.urls)),
     path('get_cities/', get_meeting_city, name='get_cities'),
     path('get_subregions/', get_meeting_subregion, name='get_subregions'),
     path('meetings_map', meetings_map_view, name='meetings_map'),
