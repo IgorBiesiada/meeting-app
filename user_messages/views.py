@@ -1,26 +1,23 @@
-from django.shortcuts import render
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView
-from user_messages.forms import MessageForm
+from rest_framework import generics
 from user_messages.models import Message
-from django.contrib.auth.mixins import LoginRequiredMixin
+from user_messages.serializers import MessageSerializer
+from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 
-class UserMessagesView(LoginRequiredMixin, CreateView):
+class UserMessagesView(generics.CreateAPIView):
     model = Message
-    form_class = MessageForm
-    template_name = 'messages.html'
-    success_url = reverse_lazy('home:home')
+    serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        serializer.save(sender=self.request.user)
+    
 
-    def form_valid(self, form):
-        form.instance.sender = self.request.user
-        return super().form_valid(form)
-
-class UserMessagesListView(LoginRequiredMixin ,ListView):
+class UserMessagesListView(generics.ListAPIView):
     model = Message
-    template_name = 'user_messages.html'
-    context_object_name = 'messages'
-
+    serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
+    
     def get_queryset(self):
         user = self.request.user
         return Message.objects.filter(receiver=user)

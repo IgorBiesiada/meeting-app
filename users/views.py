@@ -1,17 +1,16 @@
 from cities_light.models import City
 from django.contrib.auth.views import LoginView
-from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-
 from .models import User
 from django.views.generic import CreateView, TemplateView
-from users.forms import UserRegistrationForm, CustomUserLoginForm
 from django.core.mail import send_mail
 from config.settings import DEFAULT_FROM_EMAIL
 from django.urls import reverse_lazy
-
+from rest_framework import viewsets
 # Create your views here.
+
+class UserViewSet(viewsets.ViewSet)
 
 class RegisterUserView(CreateView):
     model = User

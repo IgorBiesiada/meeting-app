@@ -1,7 +1,7 @@
 from django.http import HttpResponseNotAllowed, HttpResponse
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 import stripe
-from django.views.generic import View, TemplateView
+from django.views.generic import TemplateView
 from django.urls import reverse
 from config import settings
 from meetings.models import Meeting
@@ -10,6 +10,7 @@ from participations.models import Participation
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from payment.models import HistoryPayment
+from rest_framework.views import APIView
 # Create your views here.
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -17,7 +18,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 class PaymentCancelView(TemplateView):
     template_name = 'cancel.html'
 
-class CreatePaymentView(View):
+class CreatePaymentView(APIView):
     def post(self, request, meeting_id, *args, **kwargs):
         meeting = get_object_or_404(Meeting, id=meeting_id)
         user_email = request.user.email
@@ -38,42 +39,24 @@ class CreatePaymentView(View):
             billing_address_collection='required',
             success_url=request.build_absolute_uri(reverse('success')) + f'?meeting_id={meeting.id}',
             cancel_url=request.build_absolute_uri(reverse('cancel')),
-            customer_email=user_email
-        )
-        
-        metadata = {
+            customer_email=user_email,
+            metadata = {
             'user_id': request.user.id,
             'meeting_id': meeting.id,
         }
+        )
         
         return redirect(checkout_session.url)
 
     def get(self, request, *args, **kwargs):
-        return HttpResponseNotAllowed(['POST']) #dozwolone tylko żądania POST
+        return HttpResponseNotAllowed(['POST']) 
 
 
-class PaymentSuccessView(View):
+class PaymentSuccessView(APIView):
     def get(self, request, *args, **kwargs):
         meeting_id = request.GET.get('meeting_id')
         meeting = get_object_or_404(Meeting, id=meeting_id)
-        user = request.user
-
-        if not user.is_authenticated:
-            messages.error(request, 'Musisz być zalogowany, aby dokończyć rejestrację.')
-            return redirect('meetings')
-
-        if meeting.created_by == user:
-            messages.error(request, 'Nie możesz dołączyć do własnego spotkania.')
-            return redirect('meeting_detail', pk=meeting.id)
-
-        if meeting.number_of_seats > 0:
-            participation, created = Participation.objects.get_or_create(meeting=meeting, participant=user)
-            meeting.number_of_seats -= 1
-            participation.save()
-            meeting.save()
-            messages.success(request, 'Płatność zakończona, dołączyłeś do wydarzenia!')
-        else:
-            messages.error(request, 'Brak miejsc, nie możesz dołączyć.')
+        messages.success(request, 'Płatność w trakcie przetwarzania')
 
         return redirect('meetings:meeting_detail', pk=meeting.id)
 
@@ -118,6 +101,16 @@ def stripe_webhook(request):
                 meeting_title_snapshot=meeting.title,
                 stripe_session_id=stripe_session_id
             )
+            
+            if meeting.number_of_seats > 0:
+                participation, created = Participation.objects.get_or_create(
+                    meeting=meeting, 
+                    participant=user
+                )
+                
+                if created:
+                    meeting.number_of_seats -= 1
+                    meeting.save()
             
             print(f"Udana płatność! ID sesji: {session['id']}")
             print(f"Mail klienta: {session.get('customer_details', {}).get('email')}")

@@ -4,7 +4,6 @@ import pytest
 from django.test import Client
 from django.urls import reverse
 from unittest import mock
-from meetings.forms import MeetingForm
 from meetings.models import Meeting
 from users.models import User
 from django.core import mail

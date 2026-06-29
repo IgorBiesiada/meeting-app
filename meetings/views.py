@@ -14,6 +14,7 @@ from meetings.permissions import IsOwnerOrReadOnly
 from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 
 
