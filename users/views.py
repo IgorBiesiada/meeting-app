@@ -8,50 +8,63 @@ from django.core.mail import send_mail
 from config.settings import DEFAULT_FROM_EMAIL
 from django.urls import reverse_lazy
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from users.serializers import UserSerializer, ChangeEmailSerializer, ChangeUsernameSerializer
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
 # Create your views here.
 
-class UserViewSet(viewsets.ViewSet)
-
-class RegisterUserView(CreateView):
-    model = User
-    form_class = UserRegistrationForm
-    template_name = 'register.html'
-    success_url = reverse_lazy('login')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        region_id = self.request.GET.get('region_id') #pobieramy region z formularza
-        if region_id:
-            context['form'].fields['region'].initial = region_id #jesli region istnieje ustawiamy go jako wartość domyslna dla pola region
-
-        return context
-
-    def form_valid(self, form):
-        user = form.save()
-        email = form.cleaned_data['email']
+class UserViewSet(viewsets.ViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    
+    def get_permissions(self):
+        if self.action == 'create':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+    
+    def perform_create(self, serializer):
+        user = serializer.save()
+        email = user.email
         send_mail(
-            'lest s meet',
-            'Witamy na pokładzie życzymy miłych spotkań',
-            DEFAULT_FROM_EMAIL,
+            'Let\'s meet',
+            'Witamy na pokładzie, życzymy miłych spotkań!',
+            'twoj@mail.com', 
             [email],
             fail_silently=False
         )
-        return super().form_valid(form)
 
-class CustomLoginUserView(LoginView):
-    form_class = CustomUserLoginForm
-    template_name = 'login.html'
-    redirect_authenticated_user = False
+    @action(detail=True, methods=["put"], name="Change Email")
+    def change_email(self, request, pk=None):
+        user = request.user
+        serializer = ChangeEmailSerializer(instance=user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save() 
+            
+            return Response(
+                {"message": "Twój email został pomyślnie zaktualizowany!", "email": user.email}, 
+                status=status.HTTP_200_OK
+            )
+            
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def form_valid(self, form):
-        user = form.get_user()
-        if user.is_baned:
-            return redirect(reverse_lazy('users:banned'))
-        return super().form_valid(form)
+    @action(detail=True, methods=["put"], name="Change Username")
+    def change_username(self, request, pk=None):
+        user = request.user
+        serializer = ChangeUsernameSerializer(instance=user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
 
-    def get_success_url(self):
-        return reverse_lazy('home:home')
+            return Response(
+                {"message": 'Zmiana nazwy użytkownika przebiegła pomyślnie', "email": user.email}, 
+                status=status.HTTP_200_OK
+            )
+            
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class HomeBeforeLoginView(TemplateView):
     template_name = 'landing_page.html'
