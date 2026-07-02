@@ -97,8 +97,8 @@ def meetings_map_view(request):
         if meeting.meeting_city and meeting.meeting_city.latitude and meeting.meeting_city.longitude:
             locations.append({
                 'title': meeting.title,
-                'lat': float(meeting.meeting_city.latitude),  # Pobranie szerokości geograficznej
-                'lon': float(meeting.meeting_city.longitude),  # Pobranie długości geograficznej
+                'lat': float(meeting.meeting_city.latitude),  
+                'lon': float(meeting.meeting_city.longitude),  
                 'description': meeting.description,
             })
 
@@ -121,12 +121,12 @@ class OutdatedMeetingsListView(generics.ListAPIView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         meetings = context['meetings']
-        user = self.request.user  # pobieranie aktualnego zalogowanego uzytkonika
+        user = self.request.user  
 
         user_ratings = {
             meeting.id: Rating.objects.filter(meeting=meeting, user=self.request.user).exists()
             for meeting in meetings
         }
 
-        context['user_ratings'] = user_ratings  # dodajemy do kontekstu
+        context['user_ratings'] = user_ratings  
         return context

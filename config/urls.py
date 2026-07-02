@@ -20,11 +20,6 @@ from django.urls import path, include
 
 
 
-
-
-
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('comments.urls')),
@@ -34,7 +29,6 @@ urlpatterns = [
     path('', include('payment.urls')),
     path('', include('rating.urls')),
     path('', include('user_messages.urls')),
-    path('', include('user_profile.urls')),
     path('', include('users.urls')),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('accounts/', include('allauth.urls'))

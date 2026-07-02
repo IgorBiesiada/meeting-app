@@ -2,13 +2,14 @@ from rest_framework import serializers
 from meetings.models import Meeting
 from participations.models import Participation
 
-class MeetingSerializer(serializers.serializer):
-    model = Meeting
-    fields = ['title', 'description', 'date', 'time', 'created_by', 'created_at',
+class MeetingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Meeting
+        fields = ['title', 'description', 'date', 'time', 'created_by', 'created_at',
               'number_of_seats', 'price', 'meeting_city', 'meeting_region', 'meeting_subregion']
     
-    def get_is_participant(self, obj):
-        request = self.context.get('request')
-        if request and request.user.is_authenticated:
-             return Participation.objects.filter(meeting=obj, participant=request.user).exists()
-        return False
+        def get_is_participant(self, obj):
+            request = self.context.get('request')
+            if request and request.user.is_authenticated:
+                return Participation.objects.filter(meeting=obj, participant=request.user).exists()
+            return False

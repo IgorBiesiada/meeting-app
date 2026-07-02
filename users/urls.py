@@ -1,19 +1,19 @@
 from django.urls import path, include
-from users.views import  HomeBeforeLoginView, LogoutUserView, get_city, BannedUsersView
+from users.views import  CustomTokenObtainPairView, UserViewSet
+from rest_framework.routers import DefaultRouter
 
 from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
+    TokenRefreshView
 )
 
+router = DefaultRouter()
 
 app_name = 'users'
 
+router.register(r'users', UserViewSet, basename='users')
+
 urlpatterns = [
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('', HomeBeforeLoginView.as_view(), name='landing_page'),
-    path('banned/', BannedUsersView.as_view(), name='banned'),
-    path('get_city/', get_city, name='get_city'),
-    path('logout_redirect/', LogoutUserView.as_view(), name='logout_redirect')
-]
+    path('api/', include(router.urls))
+    ]

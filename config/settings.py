@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'users',
     'home',
     'meetings',
-    'user_profile',
     'cities_light',
     'comments',
     'participations',

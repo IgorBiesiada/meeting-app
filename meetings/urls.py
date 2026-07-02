@@ -12,7 +12,7 @@ router = DefaultRouter()
 
 app_name = 'meetings'
 
-router.register(r'meetings', MeetingViewSet, basename='meeting')
+router.register(r'meetings', MeetingViewSet, basename='meetings')
 
 urlpatterns = [
     path('api/', include(router.urls)),
