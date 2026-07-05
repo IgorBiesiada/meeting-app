@@ -2,6 +2,7 @@ from rest_framework import generics
 from user_messages.models import Message
 from user_messages.serializers import MessageSerializer
 from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
 # Create your views here.
 
 class UserMessagesView(generics.CreateAPIView):
@@ -20,4 +21,4 @@ class UserMessagesListView(generics.ListAPIView):
     
     def get_queryset(self):
         user = self.request.user
-        return Message.objects.filter(receiver=user)
+        return Message.objects.filter(Q(receiver=user) | Q(sender=user))

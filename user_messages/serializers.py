@@ -3,5 +3,7 @@ from user_messages.models import Message
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    model = Message
-    fields = ['sender', 'receiver', 'content', 'timestamp']
+    class Meta:
+        model = Message
+        fields = ['receiver', 'content']
+    
