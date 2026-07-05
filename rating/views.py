@@ -10,11 +10,11 @@ from rest_framework.permissions import IsAuthenticated
 class RatingAddView(generics.CreateAPIView):
     model = Rating
     serializer_class = RatingSerializer
-    authentication_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         meeting = get_object_or_404(Meeting, pk=self.kwargs.get('pk')) 
-        serializer.save(meeting=meeting, author=self.request.user)
+        serializer.save(meeting=meeting, user=self.request.user)
     
     def get_success_url(self):
         return reverse_lazy('meetings:meetings')

@@ -4,5 +4,5 @@ from participations.views import MeetingParticipationView
 app_name = 'participations'
 
 urlpatterns = [
-    path('api/meeting/participation/', MeetingParticipationView.as_view(), name='meeting-participation')
+    path('meeting/<int:meeting_id>/participation/', MeetingParticipationView.as_view(), name='meeting-participation')
 ]

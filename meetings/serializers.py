@@ -5,8 +5,7 @@ from participations.models import Participation
 class MeetingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Meeting
-        fields = ['title', 'description', 'date', 'time', 'created_by', 'created_at',
-              'number_of_seats', 'price', 'meeting_city', 'meeting_region', 'meeting_subregion']
+        fields = ['title', 'description', 'date', 'time', 'number_of_seats', 'price', 'meeting_city', 'meeting_region', 'meeting_subregion']
     
         def get_is_participant(self, obj):
             request = self.context.get('request')

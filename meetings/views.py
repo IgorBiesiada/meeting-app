@@ -53,16 +53,16 @@ class MeetingViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
-        self.send_mail(self.request.user.email)
+#        self.send_mail(self.request.user.email)
 
-    def send_mail(self, user_mail):
-        send_mail(
-            'let s meet',
-            'Właśnie utworzyłeś spotkanie!!!! Gratulacje!!!!',
-            DEFAULT_FROM_EMAIL,
-            [user_mail],
-            fail_silently=False
-        )
+#    def send_mail(self, user_mail):
+#        send_mail(
+#            'let s meet',
+#            'Właśnie utworzyłeś spotkanie!!!! Gratulacje!!!!',
+#            DEFAULT_FROM_EMAIL,
+#            [user_mail],
+#            fail_silently=False
+#        )
 
     @action(detail=False, methods=['get'])
     def my_meetings(self, request):

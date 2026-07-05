@@ -12,8 +12,7 @@ from rest_framework.response import Response
 class MeetingParticipationView(APIView):
     permission_classes = [IsAuthenticated]
     
-    def post(self, request, *args, **kwargs):
-        meeting_id = request.data.get('meeting_id')  
+    def post(self, request, meeting_id, *args, **kwargs): 
         action = request.data.get('action')  
         meeting = get_object_or_404(Meeting, id=meeting_id)
         user = request.user  
