@@ -30,5 +30,6 @@ urlpatterns = [
     path('', include('user_messages.urls')),
     path('', include('users.urls')),
     path('logout/', LogoutView.as_view(), name='logout'),
-    path('accounts/', include('allauth.urls'))
+    path('auth/', include('dj_rest_auth.urls')),
+    path('auth/registration/', include('dj_rest_auth.registration.urls')),
 ]
