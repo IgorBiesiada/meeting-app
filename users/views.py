@@ -44,10 +44,10 @@ class UserViewSet(viewsets.ModelViewSet):
         user = request.user
         serializer = ChangeEmailSerializer(instance=user, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save() 
+            update_serializer = serializer.save() 
             
             return Response(
-                {"message": "Twój email został pomyślnie zaktualizowany!", "email": user.email}, 
+                {"message": "Twój email został pomyślnie zaktualizowany!", "email": update_serializer.email}, 
                 status=status.HTTP_200_OK
             )
             
@@ -58,10 +58,10 @@ class UserViewSet(viewsets.ModelViewSet):
         user = request.user
         serializer = ChangeUsernameSerializer(instance=user, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save()
+            update_serializer = serializer.save()
 
             return Response(
-                {"message": 'Zmiana nazwy użytkownika przebiegła pomyślnie', "email": user.email}, 
+                {"message": 'Zmiana nazwy użytkownika przebiegła pomyślnie', "email": update_serializer.email}, 
                 status=status.HTTP_200_OK
             )
             
@@ -72,10 +72,10 @@ class UserViewSet(viewsets.ModelViewSet):
         user = request.user
         serializer = ChangePasswordSerializer(instance=user, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save()
+            update_serializer = serializer.save()
 
             return Response(
-                {"message": 'Twoje hasło zostało zmienione', "email": user.email}, 
+                {"message": 'Twoje hasło zostało zmienione', "email": update_serializer.email}, 
                 status=status.HTTP_200_OK
             )
             
