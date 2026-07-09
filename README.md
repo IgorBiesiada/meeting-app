@@ -132,4 +132,34 @@ The API will be available at `http://127.0.0.1:8000/`.
 | `GET/POST /meetings/api/meetings/` | List / create meetings |
 | `POST /meeting/<id>/participation/` | Join or leave a meeting |
 | `POST /add_comment/<meeting_id>/` | Add a comment to a meeting |
-|
+| `POST /<meeting_id>/payment/` | Create a Stripe Checkout session |
+| `POST /rating/<meeting_id>/` | Rate a meeting (1–5, one rating per user) |
+| `POST /messages/` | Send a direct message to another user |
+| `GET /user_messages/` | List messages sent/received by the current user |
+| `PUT /users/api/users/change_password/` | Change the current user's password |
+
+---
+
+## 📚 What I Learned From This Project
+
+Building **Let's Meet** was primarily an exercise in connecting a Django backend to real external services and hardening it the way a production API should be:
+
+- **Integrating third-party APIs end-to-end** — from Stripe's Checkout + signature-verified webhooks, through SendGrid transactional emails, to the Perspective API for automated content moderation and OpenCage for geocoding. Each integration meant handling external failures, API keys, and asynchronous confirmation flows (e.g. payment status arriving via webhook rather than the initial request).
+- **Securing API endpoints with JWT stored in HttpOnly cookies** — instead of the common (but XSS-vulnerable) `localStorage` approach, tokens are issued and refreshed as HttpOnly cookies via `dj-rest-auth` + `SimpleJWT`, significantly reducing the attack surface for token theft.
+- **Extending SimpleJWT's authentication flow** — overriding `TokenObtainPairSerializer` to reject login attempts from banned users (`is_baned`) directly at the token-issuance stage, before any session is created.
+- **Designing permission-aware, filterable REST APIs** — implementing object-level permissions (`IsOwnerOrReadOnly`) and query-parameter-driven filtering directly inside DRF `ViewSets`.
+- **Managing configuration safely** — keeping all secrets and environment-specific values out of source control via `.env` + `python-decouple`.
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] **Docker & Docker Compose** — containerize the app (Django + PostgreSQL) for a one-command local setup and easier deployment.
+- [ ] **React frontend** — currently in early development as a separate client for the API; basic setup in place, UI and state management still to come.
+- [ ] Expand automated test coverage with `pytest-django`.
+
+---
+
+## 📄 License
+
+This project is available for educational and portfolio purposes.
