@@ -1,19 +1,6 @@
-import {BrowserRouter as Router, Routes, Route } from "react-router-dom"
-import BaseLayout from "./components/BaseLayout"
-import Home from "./pages/Home"
-import Register from "./components/RegisterForm"
-
-function App() {
-    return (
-      <Router>
-        <Routes>
-          <Route element={<BaseLayout />}>
-            <Route path="/" element={<Home />}/>
-            <Route path="register" element={<Register />}/>
-          </Route>
-        </Routes>
-      </Router>
-    )
-}
-
-export default App
+import React from "react";
+import { createRoot } from "react-dom/client";
+ 
+const container = document.getElementById("app");
+const root = createRoot(container);
+root.render(<h1>Hello, World!</h1>);
