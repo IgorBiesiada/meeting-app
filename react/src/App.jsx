@@ -1,6 +1,26 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
- 
-const container = document.getElementById("app");
-const root = createRoot(container);
-root.render(<h1>Hello, World!</h1>);
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import  Navbar from "./components/Navbar";
+import RegisterForm from "./components/RegisterForm";
+import LoginForm from "./components/LoginForm";
+
+export default function App() {
+    const isLoggedIn = false;
+    
+    return(
+        <BrowserRouter>
+            {isLoggedIn && (
+            <header> 
+                <Navbar />
+            </header>
+            )}
+            
+            <main>
+                <Routes>
+                    <Route path="/" element={<RegisterForm />} />
+                    <Route path="/" element={<LoginForm />} />
+                </Routes>
+            </main>
+        
+        </BrowserRouter>
+        )
+}

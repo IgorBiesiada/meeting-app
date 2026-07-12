@@ -1,10 +1,11 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-import person from "./data/person"; 
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.jsx'; 
+import './index.css';
 
-const container = document.getElementById("app");
-const root = createRoot(container);
-
-function calc(a, b, operation) {
-  
-}
+const rootElement = document.getElementById('app');
+ReactDOM.createRoot(rootElement).render(
+  <React.StrictMode>
+    <App />  
+  </React.StrictMode>
+);
