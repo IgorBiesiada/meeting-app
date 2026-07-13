@@ -1,6 +1,6 @@
 from rest_framework import generics
-from backend.user_messages.models import Message
-from backend.user_messages.serializers import MessageSerializer
+from user_messages.models import Message
+from user_messages.serializers import MessageSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 # Create your views here.

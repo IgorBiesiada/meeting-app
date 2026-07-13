@@ -3,13 +3,13 @@ from django.shortcuts import redirect, get_object_or_404
 import stripe
 from django.views.generic import TemplateView
 from django.urls import reverse
-from backend.config import settings
-from backend.meetings.models import Meeting
-from backend.users.models import User
-from backend.participations.models import Participation
+from config import settings
+from meetings.models import Meeting
+from users.models import User
+from participations.models import Participation
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
-from backend.payment.models import HistoryPayment
+from payment.models import HistoryPayment
 from rest_framework.views import APIView
 # Create your views here.
 

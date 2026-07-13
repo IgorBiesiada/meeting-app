@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from backend.meetings.models import Meeting
-from backend.rating.serializers import RatingSerializer
-from backend.rating.models import Rating
+from meetings.models import Meeting
+from rating.serializers import RatingSerializer
+from rating.models import Rating
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 # Create your views here.

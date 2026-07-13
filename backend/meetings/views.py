@@ -1,16 +1,16 @@
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.shortcuts import render
-from backend.meetings.models import Meeting
+from meetings.models import Meeting
 from django.http import JsonResponse
 from cities_light.models import SubRegion, City
-from backend.config.settings import DEFAULT_FROM_EMAIL, GEOCODING_API_KEY
+from config.settings import DEFAULT_FROM_EMAIL, GEOCODING_API_KEY
 from opencage.geocoder import OpenCageGeocode
-from backend.rating.models import Rating
+from rating.models import Rating
 from rest_framework import generics
-from backend.meetings.serializers import MeetingSerializer
+from meetings.serializers import MeetingSerializer
 from rest_framework import permissions  
-from backend.meetings.permissions import IsOwnerOrReadOnly
+from meetings.permissions import IsOwnerOrReadOnly
 from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework.decorators import action

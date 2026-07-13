@@ -1,5 +1,5 @@
 from django.urls import path
-from backend.rating.views import RatingAddView
+from rating.views import RatingAddView
 
 app_name = 'rating'
 

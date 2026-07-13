@@ -1,5 +1,5 @@
 from django.urls import path
-from backend.payment.views import CreatePaymentView, PaymentCancelView, PaymentSuccessView
+from payment.views import CreatePaymentView, PaymentCancelView, PaymentSuccessView
 
 app_name = 'payment'
 

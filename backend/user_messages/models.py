@@ -1,6 +1,5 @@
 from django.db import models
-
-from backend.config import settings
+from config import settings
 
 
 # Create your models here.

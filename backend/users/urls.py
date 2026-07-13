@@ -1,5 +1,5 @@
 from django.urls import path, include
-from backend.users.views import  CustomTokenObtainPairView, UserViewSet
+from users.views import  CustomTokenObtainPairView, UserViewSet
 from rest_framework.routers import DefaultRouter
 
 from rest_framework_simplejwt.views import (

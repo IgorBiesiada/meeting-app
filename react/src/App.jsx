@@ -17,7 +17,7 @@ export default function App() {
             <main>
                 <Routes>
                     <Route path="/" element={<RegisterForm />} />
-                    <Route path="/" element={<LoginForm />} />
+                    <Route path="/login/" element={<LoginForm />} />
                 </Routes>
             </main>
         

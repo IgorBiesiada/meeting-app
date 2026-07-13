@@ -1,5 +1,5 @@
 from django.urls import path
-from backend.participations.views import MeetingParticipationView
+from participations.views import MeetingParticipationView
 
 app_name = 'participations'
 

@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_BASE_URL;
+
 export default function LoginForm() {
   const [formData, setFormData] = useState({
     username: "",
@@ -15,11 +17,11 @@ export default function LoginForm() {
     e.preventDefault();
     setError(null);
     try {
-      // Tu strzelasz do swojego endpointu logowania (np. JWT Token Obtain)
+      
       console.log("Wysyłam dane logowania:", formData);
       
-      /* PRZYKŁAD INTEGRACJI Z DJANGO SIMPLE JWT:
-      const response = await fetch("http://localhost:8000/api/token/", {
+      
+      const response = await fetch(`${API_URL}token/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -28,17 +30,14 @@ export default function LoginForm() {
       const data = await response.json();
 
       if (response.ok) {
-        // SUKCES: Zapisujemy token w pamięci przeglądarki!
         localStorage.setItem("access_token", data.access);
         localStorage.setItem("refresh_token", data.refresh);
         console.log("Zalogowano pomyślnie, token zapisany.");
         
-        // Tutaj przekierowujesz usera (np. window.location.href = "/dashboard")
       } else {
-        // BŁĄD (np. 401 Unauthorized - złe hasło)
         setError("Nieprawidłowa nazwa użytkownika lub hasło.");
       }
-      */
+      
 
     } catch (err) {
       console.error(err);
@@ -59,14 +58,14 @@ export default function LoginForm() {
           Zaloguj się na swoje konto
         </p>
         
-        {/* Obsługa błędu (np. złe hasło z Django) */}
+        
         {error && (
           <p className="text-red-400 bg-red-500/10 p-3 rounded-lg text-sm mb-6 border border-red-500/20 text-center">
             {error}
           </p>
         )}
         
-        {/* Pole: Nazwa użytkownika */}
+        
         <div className="mb-5">
           <input
             type="text"
@@ -78,7 +77,7 @@ export default function LoginForm() {
           />
         </div>
 
-        {/* Pole: Hasło */}
+        
         <div className="mb-6">
           <input
             type="password"
@@ -90,7 +89,7 @@ export default function LoginForm() {
           />
         </div>
 
-        {/* Przycisk */}
+        
         <button 
           type="submit" 
           className="w-full py-3.5 mt-2 bg-gradient-to-r from-purple-500 to-emerald-500 text-white font-bold text-lg rounded-lg shadow-lg shadow-emerald-500/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-200"
@@ -98,7 +97,7 @@ export default function LoginForm() {
           Zaloguj się
         </button>
 
-        {/* Opcjonalny link na dół */}
+        
         <p className="text-gray-400 text-sm text-center mt-6">
           Nie masz jeszcze konta? <a href="/" className="text-purple-400 hover:text-purple-300 transition-colors">Zarejestruj się</a>
         </p>

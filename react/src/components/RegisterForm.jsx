@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_BASE_URL;
+
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
     username: "",
@@ -13,23 +15,42 @@ export default function RegisterForm() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-    try {
-      // Tu leci Twój kod do Django
-      console.log("Wysyłam do Django:", formData);
-      // Symulacja błędu, żebyś zobaczył jak wygląda na czerwono:
-      // setError({ username: ["Ten użytkownik już istnieje"] });
-    } catch (err) {
-      console.error(err);
+  e.preventDefault();
+  setError(null);
+  
+  try {
+    console.log("Wysyłam do Django:", formData);
+    
+    
+    const response = await fetch(`${API_URL}users/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log("Konto utworzone pomyślnie!", data);
+      alert("Konto założone! Możesz się zalogować.");
+      window.location.href = "/login";
+    } else {
+      
+      console.error("Django zwróciło błąd:", data);
+      setError(data); 
     }
-  };
+
+  } catch (err) {
+    console.error("Błąd sieci:", err);
+    setError({ username: ["Błąd połączenia z serwerem."] });
+  }
+};
 
   return (
-    // Główny kontener (wyśrodkowanie na ekranie)
+    
     <div className="flex items-center justify-center min-h-[80vh]">
       
-      {/* Karta formularza - ciemny szary (gray-800) z ramką i cieniem */}
+      
       <form 
         onSubmit={handleSubmit} 
         className="bg-gray-800 p-8 sm:p-10 rounded-2xl shadow-2xl w-full max-w-md border border-gray-700"
@@ -41,14 +62,14 @@ export default function RegisterForm() {
           Wypełnij dane, aby utworzyć konto
         </p>
         
-        {/* Obsługa błędu */}
+        
         {error?.username && (
           <p className="text-red-400 bg-red-500/10 p-3 rounded-lg text-sm mb-6 border border-red-500/20">
             {error.username[0]}
           </p>
         )}
         
-        {/* Pole: Nazwa użytkownika */}
+        
         <div className="mb-5">
           <input
             type="text"
@@ -60,7 +81,7 @@ export default function RegisterForm() {
           />
         </div>
 
-        {/* Pole: Email */}
+        
         <div className="mb-5">
           <input
             type="email"
@@ -72,7 +93,7 @@ export default function RegisterForm() {
           />
         </div>
 
-        {/* Pole: Hasło */}
+        
         <div className="mb-6">
           <input
             type="password"
@@ -84,7 +105,7 @@ export default function RegisterForm() {
           />
         </div>
 
-        {/* Epicki przycisk z gradientem fiolet -> zieleń */}
+        
         <button 
           type="submit" 
           className="w-full py-3.5 mt-2 bg-gradient-to-r from-purple-500 to-emerald-500 text-white font-bold text-lg rounded-lg shadow-lg shadow-emerald-500/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-200"

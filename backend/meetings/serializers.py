@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from backend.meetings.models import Meeting
-from backend.participations.models import Participation
+from meetings.models import Meeting
+from participations.models import Participation
 
 class MeetingSerializer(serializers.ModelSerializer):
     class Meta:

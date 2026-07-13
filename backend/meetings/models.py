@@ -1,5 +1,5 @@
 from django.db import models
-from backend.config import settings
+from config import settings
 from cities_light.models import City, Region, SubRegion
 from django.db.models import Avg
 # Create your models here.

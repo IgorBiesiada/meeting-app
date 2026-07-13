@@ -4,7 +4,7 @@ from django.views.generic import CreateView
 from rest_framework.permissions import IsAuthenticated
 from comments.serializer import CommentSerializer
 from comments.models import Comment
-from backend.meetings.models import Meeting
+from meetings.models import Meeting
 from rest_framework import generics
 
 # Create your views here.

@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from backend.meetings.views import (MeetingViewSet, 
+from meetings.views import (MeetingViewSet, 
                             get_meeting_subregion,
                             get_meeting_city,
                             meetings_map_view,

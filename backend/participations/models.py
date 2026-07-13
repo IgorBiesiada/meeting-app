@@ -1,7 +1,6 @@
 from django.db import models
-
-from backend.config import settings
-from backend.meetings.models import Meeting
+from config import settings
+from meetings.models import Meeting
 
 
 # Create your models here.

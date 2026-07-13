@@ -1,6 +1,6 @@
 from django.db import models
-from backend.meetings.models import Meeting
-from backend.users.models import User
+from meetings.models import Meeting
+from users.models import User
 
 
 # Create your models here.

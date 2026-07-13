@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from backend.user_messages.models import Message
+from user_messages.models import Message
 
 
 class MessageSerializer(serializers.ModelSerializer):

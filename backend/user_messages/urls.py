@@ -1,5 +1,5 @@
 from django.urls import path
-from backend.user_messages.views import UserMessagesView, UserMessagesListView
+from user_messages.views import UserMessagesView, UserMessagesListView
 
 app_name = 'user_messages'
 

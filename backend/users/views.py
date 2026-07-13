@@ -2,11 +2,11 @@ from cities_light.models import City
 from django.http import JsonResponse
 from .models import User
 from django.core.mail import send_mail
-from backend.config.settings import DEFAULT_FROM_EMAIL
+from config.settings import DEFAULT_FROM_EMAIL
 from django.urls import reverse_lazy
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from backend.users.serializers import UserSerializer, ChangeEmailSerializer, ChangeUsernameSerializer, ChangePasswordSerializer
+from users.serializers import UserSerializer, ChangeEmailSerializer, ChangeUsernameSerializer, ChangePasswordSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
