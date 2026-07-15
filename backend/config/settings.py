@@ -13,7 +13,6 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
-from decouple import config
 from datetime import timedelta
 
 load_dotenv()
@@ -44,18 +43,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    
     'users',
     'meetings',
-    'cities_light',
     'comments',
     'participations',
     'payment',
     'user_messages',
     'rating',
 
-    'crispy_forms',
-    'crispy_bootstrap5',
-    
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -195,9 +191,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LOGIN_URL = 'landing_page'
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'landing_page'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -231,17 +224,10 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = os.environ.get('EMAIL_PORT')
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
 
-CITIES_LIGHT_INCLUDE_COUNTRIES = ['PL']
-CITIES_LIGHT_TRANSLATION_LANGUAGES = ['pl']
-
 STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 WEBHOOK_SECRET = os.environ.get('WEBHOOK_SECRET')
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-
-CRISPY_TEMPLATE_PACK = "bootstrap5"
-
 PERSPECTIVE_API_KEY = os.environ.get('PERSPECTIVE_API_KEY')
 
-GEOCODING_API_KEY = os.environ.get('GEOCODING_API_KEY')
+GEOAPIFY_KEY = os.environ.get('GEOAPIFY_KEY')

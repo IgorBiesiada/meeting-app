@@ -3,8 +3,7 @@ from django.core.mail import send_mail
 from django.shortcuts import render
 from meetings.models import Meeting
 from django.http import JsonResponse
-from cities_light.models import SubRegion, City
-from config.settings import DEFAULT_FROM_EMAIL, GEOCODING_API_KEY
+from config.settings import DEFAULT_FROM_EMAIL
 from opencage.geocoder import OpenCageGeocode
 from rating.models import Rating
 from rest_framework import generics
@@ -70,43 +69,6 @@ class MeetingViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-
-@api_view(['GET'])
-def get_meeting_subregion(request):
-    region_id = request.query_params.get('region_id')
-    if region_id:
-        subregion = SubRegion.objects.filter(region_id=region_id).order_by('name').values('id', 'name')
-        return JsonResponse(list(subregion), safe=False)
-    return JsonResponse([], safe=False)
-
-def get_meeting_city(request):
-    region_id = request.GET.get('region_id')
-    if region_id:
-        cities = City.objects.filter(region_id=region_id).order_by('name').values('id', 'name')
-        return JsonResponse(list(cities), safe=False)
-    return JsonResponse([], safe=False)
-
-
-def meetings_map_view(request):
-    geocoder = OpenCageGeocode(GEOCODING_API_KEY)
-
-    meetings = Meeting.objects.all()
-    locations = []
-
-    for meeting in meetings:
-        if meeting.meeting_city and meeting.meeting_city.latitude and meeting.meeting_city.longitude:
-            locations.append({
-                'title': meeting.title,
-                'lat': float(meeting.meeting_city.latitude),  
-                'lon': float(meeting.meeting_city.longitude),  
-                'description': meeting.description,
-            })
-
-    context = {
-            'locations': locations,
-            }
-
-    return render(request, 'map.html', context)
 
 class OutdatedMeetingsListView(generics.ListAPIView):
     model = Meeting.objects.all()

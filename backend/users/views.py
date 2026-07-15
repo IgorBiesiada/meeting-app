@@ -1,4 +1,3 @@
-from cities_light.models import City
 from django.http import JsonResponse
 from .models import User
 from django.core.mail import send_mail
@@ -83,11 +82,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 
-def get_city(request):
-    region_id = request.GET.get('region_id')
-    if region_id:
-        city = City.objects.filter(region_id=region_id).order_by('name').values('id', 'name')
-        return JsonResponse(list(city), safe=False)
-    return JsonResponse([], safe=False)
+
 
 
