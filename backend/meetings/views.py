@@ -7,13 +7,14 @@ from config.settings import DEFAULT_FROM_EMAIL
 from opencage.geocoder import OpenCageGeocode
 from rating.models import Rating
 from rest_framework import generics
-from meetings.serializers import MeetingSerializer
+from meetings.serializers import MeetingSerializer, MeetingCutSerializer
 from rest_framework import permissions  
 from meetings.permissions import IsOwnerOrReadOnly
 from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 # Create your views here.
 
 
@@ -92,3 +93,9 @@ class OutdatedMeetingsListView(generics.ListAPIView):
 
         context['user_ratings'] = user_ratings  
         return context
+
+class CutMeetingView(generics.ListAPIView):
+    queryset = Meeting.objects.all()
+    serializer_class = MeetingCutSerializer
+
+    

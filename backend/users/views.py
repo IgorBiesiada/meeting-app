@@ -13,6 +13,10 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenObtainPairSerializer
+from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
+from allauth.socialaccount.providers.discord.views import DiscordOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from dj_rest_auth.registration.views import SocialLoginView
 # Create your views here.
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -82,6 +86,14 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 
+class GitHubLoginView(SocialLoginView):
+    adapter_class = GitHubOAuth2Adapter
+    client_class = OAuth2Client
+    callback_url = "http://localhost:5173/oauth/github/callback"
 
 
-
+class DiscordLoginView(SocialLoginView):
+    adapter__class = DiscordOAuth2Adapter
+    client_class = OAuth2Client
+    callback_url = "http://localhost:5173/oauth/discord/callback"
+    

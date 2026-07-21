@@ -7,7 +7,7 @@ from rest_framework.exceptions import AuthenticationFailed
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'city', 'region']
+        fields = ['first_name', 'last_name', 'username', 'email', 'password', 'city', 'region']
         extra_kwargs = {'password': {'write_only': True}}
     
     def create(self, validated_data):
