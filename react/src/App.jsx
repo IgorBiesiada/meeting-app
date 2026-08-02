@@ -8,14 +8,16 @@ import LoginForm from "./components/LoginForm";
 import Home from "./pages/Home";
 import GithubCallback from "./components/GithubCallback";
 import DiscordCallback from "./components/DiscordCallback";
-import MeetingsPage from "./components/MeetingsPage";
-import PublicMeetingList from "./components/PublicMeetingList";
+import MeetingsPage from "./components/meetingComponents/MeetingsPage";
+import PublicMeetingList from "./components/meetingComponents/PublicMeetingList";
 import CreateMeetingForm from "./components/CreateMeetingForm";
-import MyMeetingsPage from "./components/MyMeetingsPage";
-import PastMeetingsPage from "./components/PastMeetingsPage";
+import MyMeetingsPage from "./components/meetingComponents/MyMeetingsPage";
+import PastMeetingsPage from "./components/meetingComponents/PastMeetingsPage";
 import About from "./components/About";
 import Map from "./components/Map";
-import MeetingDetailPage from "./components/MeetingDetailPage";
+import MeetingDetailPage from "./components/meetingComponents/MeetingDetailPage";
+import CompleteProfileForm from "./components/CompleteProfileForm";
+import CloseMeetingsPage from "./components/meetingComponents/CloseMeetingsPage";
 
 function AppLayout() {
   return (
@@ -77,6 +79,14 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/meetings/close"
+          element={
+            <ProtectedRoute>
+              <CloseMeetingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/meetings/past"
           element={
             <ProtectedRoute>
@@ -98,6 +108,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <MeetingDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/complete-profile"
+          element={
+            <ProtectedRoute>
+              <CompleteProfileForm />
             </ProtectedRoute>
           }
         />

@@ -1,31 +1,20 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // <-- Dodany import Link
-import Map from "./Map";
+import { Link } from "react-router-dom"; 
+import Map from "../Map";
+import SearchToolbar from "../SearchBar"; 
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
-const BACKEND_URL = API_URL.replace(/api\/$/, "");
 
 export default function MeetingsPage() {
-  const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [meetings, setMeetings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const tabs = [
-    { id: "all", label: "Wszystkie spotkania" },
-    { id: "mine", label: "Moje spotkania" },
-    { id: "past", label: "Odbyte" },
-    { id: "near", label: "Blisko Ciebie" },
-  ];
-
   const getEmptyMessage = () => {
-    if (searchQuery.trim() && activeTab === "all") {
+    if (searchQuery.trim()) {
       return "Brak spotkań pasujących do wyszukiwania.";
     }
-    if (activeTab === "mine") return "Brak spotkań — nie utworzyłeś jeszcze żadnego.";
-    if (activeTab === "past") return "Brak odbytych spotkań.";
-    if (activeTab === "near") return "Brak spotkań w Twojej okolicy.";
     return "Brak spotkań.";
   };
 
@@ -38,20 +27,13 @@ export default function MeetingsPage() {
         const token = localStorage.getItem("access_token");
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-        let url;
-
-        if (activeTab === "mine") {
-          url = `${API_URL}meetings/my_meetings/`;
-        } else if (activeTab === "past") {
-          url = `${BACKEND_URL}outdated_meetings/`;
-        } else {
-          const params = new URLSearchParams();
-          if (searchQuery.trim()) {
-            params.set("q", searchQuery.trim());
-          }
-          const queryString = params.toString();
-          url = `${API_URL}meetings/${queryString ? `?${queryString}` : ""}`;
+        const params = new URLSearchParams();
+        if (searchQuery.trim()) {
+          params.set("q", searchQuery.trim());
         }
+        
+        const queryString = params.toString();
+        const url = `${API_URL}meetings/${queryString ? `?${queryString}` : ""}`;
 
         const response = await fetch(url, { headers });
 
@@ -68,55 +50,24 @@ export default function MeetingsPage() {
         setIsLoading(false);
       }
     };
-
-    const debounce = setTimeout(fetchMeetings, activeTab === "all" ? 300 : 0);
+    
+    const debounce = setTimeout(fetchMeetings, 300);
     return () => clearTimeout(debounce);
-  }, [activeTab, searchQuery]);
+  }, [searchQuery]);
 
   return (
     <div className="h-[calc(100vh-5rem)] flex flex-col bg-gray-900 text-gray-100 font-sans overflow-hidden">
       
-      <div className="bg-gray-800 border-b border-gray-700 shrink-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-6 overflow-x-auto py-2 scrollbar-hide">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`whitespace-nowrap px-1 py-2 text-sm font-medium border-b-2 transition-colors duration-200 ${
-                  activeTab === tab.id
-                    ? "border-purple-500 text-purple-400"
-                    : "border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+      {/* TUTEJ JEST FIX: Opakowanie shrink-0 i odpowiednie tło */}
+      <div className="shrink-0 bg-gray-800 border-b border-gray-700 p-4 shadow-sm z-20">
+        <div className="max-w-7xl mx-auto">
+          <SearchToolbar onSearch={setSearchQuery} />
         </div>
       </div>
 
       <div className="flex-1 flex overflow-hidden">
         
         <div className="w-full md:w-1/2 lg:w-1/3 flex flex-col border-r border-gray-700 bg-gray-900 z-10 shadow-xl">
-          
-          {activeTab === "all" && (
-            <div className="p-4 border-b border-gray-800 bg-gray-800/30 shrink-0">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Szukaj spotkań..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-gray-900 border border-gray-600 rounded-lg pl-10 pr-4 py-2.5 text-gray-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors placeholder-gray-500"
-                />
-                <svg className="absolute left-3 top-3 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-            </div>
-          )}
-
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {isLoading && (
               <div className="text-center text-gray-400 py-4">Ładowanie spotkań...</div>
@@ -133,10 +84,9 @@ export default function MeetingsPage() {
             )}
 
             {!isLoading && !error && meetings.map((meeting, index) => (
-              /* TUTAJ JEST ZMIANA: <div ...> na <Link ...> */
               <Link 
                 to={`/meeting/${meeting.id}`}
-                key={`${meeting.title}-${meeting.date}-${meeting.time}-${index}`}
+                key={`${meeting.id || meeting.title}-${index}`}
                 className="block bg-gray-800 border border-gray-700 rounded-xl p-4 hover:border-emerald-500/50 hover:bg-gray-800/80 transition-all cursor-pointer shadow-sm hover:shadow-md group"
               >
                 <h3 className="text-lg font-bold text-gray-100 group-hover:text-purple-400 transition-colors">

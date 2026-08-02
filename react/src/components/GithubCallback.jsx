@@ -20,7 +20,6 @@ export default function GithubCallback() {
     
     if (code && !hasFetched.current) {
       hasFetched.current = true;
-
       
       if (returnedState !== savedState) {
         console.error("Invalid OAuth state");
@@ -39,25 +38,41 @@ export default function GithubCallback() {
         .then(async (res) => {
           const data = await res.json();
           
-          
           if (res.ok && data.access) { 
             
-            
             login(data.access, data.refresh);
-            
             sessionStorage.removeItem("oauth_state");
-            navigate("/meetings"); 
+            
+            
+            try {
+              const profileRes = await fetch(`${API_URL}users/me/`, {
+                headers: { "Authorization": `Bearer ${data.access}` }
+              });
+              
+              const profileData = await profileRes.json();
+              
+              
+              if (!profileData.city) {
+                navigate("/complete-profile"); 
+              } else {
+                navigate("/meetings"); 
+              }
+            } catch (err) {
+              
+              navigate("/meetings");
+            }
+            
           } else {
             setStatus("Django odrzuciło logowanie!");
             setErrorDetails(JSON.stringify(data));
           }
         })
-        .catch((err) => {
+        .catch((err) => { 
           setStatus("Błąd sieci!");
           setErrorDetails(err.toString());
         });
     }
-  }, [searchParams, navigate, login]);
+  }, [searchParams, navigate, login]); 
 
   return (
     <div className="min-h-[calc(100vh-5rem)] flex flex-col items-center justify-center bg-gray-900 text-white p-6">

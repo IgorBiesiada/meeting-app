@@ -15,6 +15,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django.db.models import Q
 # Create your views here.
 
 
@@ -71,6 +72,14 @@ class MeetingViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+    @action(detail=False, methods=['get'])
+    def close_meetings(self, request):
+        user_city = request.user.city
+        queryset = Meeting.objects.filter(meeting_city=user_city)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
 class OutdatedMeetingsListView(generics.ListAPIView):
     model = Meeting.objects.all()
     serializer_class = MeetingSerializer
@@ -78,7 +87,7 @@ class OutdatedMeetingsListView(generics.ListAPIView):
 
     def get_queryset(self):
         now = timezone.now()
-        outdated_meeting = Meeting.objects.filter(date__lt=now)
+        outdated_meeting = Meeting.objects.filter(Q(date__lt=now.date()) | Q(date=now.date(), time__lt=now.time()))
         return outdated_meeting
 
     def get_context_data(self, **kwargs):
