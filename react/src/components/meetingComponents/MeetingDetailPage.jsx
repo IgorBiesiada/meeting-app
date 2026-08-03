@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import MeetingComments from "./MeetingComments"; 
+import QuickMessage from "../QuikMessage"; 
 
 export default function MeetingDetailPage() {
   const { id } = useParams();
@@ -41,7 +42,6 @@ export default function MeetingDetailPage() {
     fetchMeetingDetail();
   }, [id]);
 
-  
   const handleDelete = async () => {
     const confirmDelete = window.confirm("Czy na pewno chcesz usunąć to spotkanie? Tej akcji nie można cofnąć.");
     if (!confirmDelete) return;
@@ -60,7 +60,6 @@ export default function MeetingDetailPage() {
         throw new Error("Nie udało się usunąć spotkania");
       }
 
-      
       alert("Spotkanie zostało pomyślnie usunięte.");
       navigate("/");
     } catch (err) {
@@ -88,15 +87,26 @@ export default function MeetingDetailPage() {
     );
   }
 
-  
   const currentUserId = localStorage.getItem("user_id"); 
-  const isOwner = meeting.author_id === parseInt(currentUserId) || meeting.is_owner === true; 
-  
+  const myId = parseInt(currentUserId, 10);
+  const isOwner = meeting.created_by === myId;
+
+  // -- POCZĄTEK DIAGNOZY --
+  console.log("=== DIAGNOZA ===");
+  console.log("1. Moje ID pobrane z localStorage:", currentUserId);
+  console.log("2. Moje ID przekonwertowane na cyfrę:", myId);
+  console.log("3. ID twórcy spotkania przesłane z Django:", meeting.created_by);
+  console.log("4. Imię twórcy spotkania z Django:", meeting.creator_name);
+  console.log("5. Czy React uważa że jesteś właścicielem?:", isOwner);
+  console.log("6. Cały obiekt spotkania z API:", meeting);
+  // -- KONIEC DIAGNOZY --
+
 
   return (
     <div className="min-h-[calc(100vh-5rem)] bg-gray-900 text-gray-100 font-sans py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto flex flex-col gap-6">
         
+       
         <div className="flex justify-between items-center">
           <Link to="/" className="inline-flex items-center text-gray-400 hover:text-purple-400 transition-colors w-fit group">
             <svg className="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -105,7 +115,6 @@ export default function MeetingDetailPage() {
             Wróć do listy
           </Link>
 
-          
           {isOwner && (
             <div className="flex gap-3">
               <Link 
@@ -125,10 +134,12 @@ export default function MeetingDetailPage() {
           )}
         </div>
 
+        
         <div className="bg-gray-800 border border-gray-700 rounded-2xl p-6 md:p-8 shadow-xl">
           <h1 className="text-3xl font-bold text-gray-100 mb-4">{meeting.title}</h1>
           
-          <div className="flex flex-wrap items-center gap-4 mb-8 text-sm font-medium">
+          
+          <div className="flex flex-wrap items-center gap-4 mb-6 text-sm font-medium">
             <span className="text-emerald-400 bg-emerald-400/10 px-3 py-1.5 rounded-lg flex items-center gap-2">
               📅 {meeting.date}
             </span>
@@ -147,17 +158,41 @@ export default function MeetingDetailPage() {
             )}
           </div>
 
+          
+          <div className="flex items-center gap-4 mb-8 p-4 bg-gray-900/50 rounded-xl border border-gray-700/50">
+            <div className="w-12 h-12 rounded-full bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-xl">
+              
+              {meeting.creator_name ? meeting.creator_name.charAt(0).toUpperCase() : "U"}
+            </div>
+            <div>
+              <p className="text-sm text-gray-400 font-medium">Organizator spotkania</p>
+              <p className="text-lg font-bold text-gray-100">
+                {meeting.creator_name || "Użytkownik #" + meeting.author_id}
+              </p>
+            </div>
+          </div>
+
+          
           <div className="prose prose-invert max-w-none text-gray-300 leading-relaxed mb-8">
             <p>{meeting.description}</p>
           </div>
 
+          
           <div className="border-t border-gray-700 pt-6">
-            <button className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-purple-500/20">
+            <button className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-purple-500/20 mb-6">
               Zapisz się na spotkanie
             </button>
+            
+            {!isOwner && (
+              <QuickMessage 
+                  receiverId={meeting.created_by} 
+                  receiverName={meeting.creator_name} 
+              />
+            )}
           </div>
         </div>
 
+        
         <MeetingComments meetingId={meeting.id} />
 
       </div>

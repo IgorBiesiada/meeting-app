@@ -18,6 +18,7 @@ import Map from "./components/Map";
 import MeetingDetailPage from "./components/meetingComponents/MeetingDetailPage";
 import CompleteProfileForm from "./components/CompleteProfileForm";
 import CloseMeetingsPage from "./components/meetingComponents/CloseMeetingsPage";
+import MessagesList from "./components/MessageList";
 
 function AppLayout() {
   return (
@@ -116,6 +117,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <CompleteProfileForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              <MessagesList />
             </ProtectedRoute>
           }
         />

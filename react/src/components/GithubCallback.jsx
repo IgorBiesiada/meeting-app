@@ -39,18 +39,19 @@ export default function GithubCallback() {
           const data = await res.json();
           
           if (res.ok && data.access) { 
-            
-            login(data.access, data.refresh);
             sessionStorage.removeItem("oauth_state");
             
-            
             try {
+              
               const profileRes = await fetch(`${API_URL}users/me/`, {
                 headers: { "Authorization": `Bearer ${data.access}` }
               });
               
               const profileData = await profileRes.json();
+              const userId = profileData.id || profileData.pk;
               
+              
+              login(data.access, data.refresh, userId);
               
               if (!profileData.city) {
                 navigate("/complete-profile"); 
@@ -58,7 +59,7 @@ export default function GithubCallback() {
                 navigate("/meetings"); 
               }
             } catch (err) {
-              
+              login(data.access, data.refresh, null);
               navigate("/meetings");
             }
             

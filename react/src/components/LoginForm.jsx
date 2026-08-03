@@ -15,7 +15,6 @@ export default function LoginForm() {
   });
   const [error, setError] = useState(null);
 
-  
   useEffect(() => {
     if (isLoggedIn) {
       navigate('/meetings');
@@ -41,11 +40,23 @@ export default function LoginForm() {
       const data = await response.json();
 
       if (response.ok) {
+
+        try {
+          const profileRes = await fetch(`${API_URL}users/me/`, {
+            headers: { "Authorization": `Bearer ${data.access}` }
+          });
+          if (profileRes.ok) {
+            const profileData = await profileRes.json();
+            const userId = profileData.id || profileData.pk;
+            login(data.access, data.refresh, userId);
+          } else {
+            login(data.access, data.refresh, null);
+          }
+        } catch (err) {
+          login(data.access, data.refresh, null);
+        }
         
-        login(data.access, data.refresh);
         console.log("Zalogowano pomyślnie, token zapisany.");
-        
-        
         navigate("/meetings");
       } else {
         setError("Nieprawidłowa nazwa użytkownika lub hasło.");
@@ -58,25 +69,17 @@ export default function LoginForm() {
 
   const handleGithubAuth = () => {
     const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID; 
-    
     const redirectUri = `${window.location.origin}/oauth/github/callback`;
-    
-    
     const state = crypto.randomUUID();
     sessionStorage.setItem("oauth_state", state);
-
     window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read:user user:email&state=${state}`;
   };
 
   const handleDiscordAuth = () => {
     const clientId = import.meta.env.VITE_DISCORD_CLIENT_ID;
-    
     const redirectUri = `${window.location.origin}/oauth/discord/callback`;
-    
-    
     const state = crypto.randomUUID();
     sessionStorage.setItem("oauth_state", state);
-
     window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=identify%20email&state=${state}`;
   };
 
@@ -128,14 +131,12 @@ export default function LoginForm() {
           Zaloguj się
         </button>
 
-        
         <div className="flex items-center my-6">
           <div className="flex-grow border-t border-gray-600"></div>
           <span className="px-4 text-sm text-gray-400">lub zaloguj przez</span>
           <div className="flex-grow border-t border-gray-600"></div>
         </div>
 
-        
         <div className="flex gap-4">
           <button
             type="button"
