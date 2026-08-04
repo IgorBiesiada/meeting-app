@@ -3,9 +3,11 @@ from meetings.models import Meeting
 from participations.models import Participation
 
 class MeetingSerializer(serializers.ModelSerializer):
+    creator_name = serializers.ReadOnlyField(source='created_by.username')
+
     class Meta:
         model = Meeting
-        fields = ['id', 'title', 'description', 'date', 'time', 'number_of_seats', 'price', 'meeting_city', 'meeting_region', 'street']
+        fields = ['id', 'title', 'description', 'date', 'time', 'number_of_seats', 'price', 'meeting_city', 'meeting_region', 'street', 'creator_name', 'created_by']
     
         def get_is_participant(self, obj):
             request = self.context.get('request')
