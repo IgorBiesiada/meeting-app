@@ -27,7 +27,10 @@ class MeetingParticipationView(APIView):
                 Participation.objects.create(meeting=meeting, participant=user)  
                 meeting.number_of_seats -= 1  
                 meeting.save()  
-                return Response({"detail": "Dołączyłeś do spotkania"}, status=status.HTTP_200_OK)  
+                return Response({"status": "joined",
+                                 "detail": "Dołączyłeś do spotkania",
+                                 "number_of_seats": meeting.number_of_seats
+                                }, status=status.HTTP_200_OK)  
             else:
                 return Response({"detail": "Brak miejsc"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -37,6 +40,10 @@ class MeetingParticipationView(APIView):
             participation.delete() 
             meeting.number_of_seats += 1  
             meeting.save() 
-            return Response({"detail": "Opuszczono spotkanie. Zwolniło się miejsce!"}, status=status.HTTP_200_OK)
+            return Response(
+                {   "status": "left",
+                    "detail": "Opuszczono spotkanie",
+                    "number_of_seats": meeting.number_of_seats
+                 }, status=status.HTTP_200_OK)
 
         return Response({"status": "Nieprawidłowa akcja"}, status=status.HTTP_400_BAD_REQUEST)  
