@@ -18,7 +18,7 @@ import Map from "./components/Map";
 import MeetingDetailPage from "./components/meetingComponents/MeetingDetailPage";
 import CompleteProfileForm from "./components/CompleteProfileForm";
 import CloseMeetingsPage from "./components/meetingComponents/CloseMeetingsPage";
-import MessagesList from "./components/MessageList";
+import ChatPage from "./components/ChatPage"; 
 
 function AppLayout() {
   return (
@@ -121,13 +121,22 @@ function AppRoutes() {
           }
         />
         <Route
-          path="/messages"
+          path="/chat"
           element={
             <ProtectedRoute>
-              <MessagesList />
+              <ChatPage />
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/chat/:chatId"
+          element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          }
+        />
+
       </Route>
     </Routes>
   );

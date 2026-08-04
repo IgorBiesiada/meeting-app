@@ -23,16 +23,12 @@ export function AuthProvider({ children }) {
       }
 
       try {
-        console.log("Wysyłam zapytanie do:", `${import.meta.env.VITE_API_BASE_URL}users/me/`);
-
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}users/me/`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`
           }
         });
-
-        console.log("Status odpowiedzi HTTP:", response.status);
 
         if (response.ok) {
           const userData = await response.json();
@@ -42,8 +38,6 @@ export function AuthProvider({ children }) {
           }
           setIsLoggedIn(true);
         } else {
-          const errorText = await response.text();
-          console.error("DJANGO ODRZUCIŁO ZAPYTANIE! Szczegóły:", errorText);
           logout();
         }
       } catch (error) {
@@ -57,15 +51,40 @@ export function AuthProvider({ children }) {
     checkToken();
   }, []);
 
-  const login = (access, refresh, userId) => {
+  
+  const login = async (access, refresh, userId) => {
     localStorage.setItem("access_token", access);
     if (refresh) {
       localStorage.setItem("refresh_token", refresh);
     }
+    
     if (userId) {
+      
       localStorage.setItem("user_id", userId);
+      setIsLoggedIn(true);
+    } else {
+      
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}users/me/`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${access}`
+          }
+        });
+        
+        if (response.ok) {
+          const userData = await response.json();
+          const fetchedUserId = userData.id || userData.pk;
+          if (fetchedUserId) {
+            localStorage.setItem("user_id", fetchedUserId);
+          }
+        }
+      } catch (err) {
+        console.error("Nie udało się pobrać ID po logowaniu:", err);
+      } finally {
+        setIsLoggedIn(true);
+      }
     }
-    setIsLoggedIn(true);
   };
 
   if (isLoading) {
@@ -77,13 +96,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider
-      value={{
-        isLoggedIn,
-        login,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

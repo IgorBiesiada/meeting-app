@@ -11,13 +11,9 @@ export default function Navbar() {
   };
 
   return (
-    
     <nav className="bg-gray-800 border-b border-gray-700 sticky top-0 z-50 shadow-xl">
-      
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-8 lg:px-12">
-        
         <div className="flex justify-between items-center h-24">
-          
           
           <div className="flex-shrink-0 flex items-center pr-8">
             <Link to="/" className="text-3xl font-bold tracking-tight"> 
@@ -27,7 +23,6 @@ export default function Navbar() {
             </Link>
           </div>
 
-          
           <div className="flex space-x-6 lg:space-x-8 overflow-x-auto items-center no-scrollbar">
             <Link 
               to={isLoggedIn ? "/meetings" : "/meetings/public"} 
@@ -54,9 +49,8 @@ export default function Navbar() {
                   Dodaj spotkanie
                 </Link>
                 
-                
                 <Link 
-                  to="/messages" 
+                  to="/chat" 
                   className="flex items-center gap-1.5 text-gray-300 hover:text-emerald-400 font-bold transition-all duration-200 whitespace-nowrap bg-gray-700/30 px-3 py-1.5 rounded-lg border border-transparent hover:border-emerald-500/30"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,7 +66,6 @@ export default function Navbar() {
             </Link>
           </div>
 
-          
           <div className="flex items-center space-x-4 ml-8">
             {isLoggedIn ? (
               <div className="flex items-center gap-5">
@@ -106,7 +99,6 @@ export default function Navbar() {
               </>
             )}
           </div>
-
         </div>
       </div>
     </nav>

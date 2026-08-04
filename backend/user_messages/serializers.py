@@ -10,14 +10,26 @@ class UserListChatSerializer(serializers.ModelSerializer):
 
 class ChatSerializer(serializers.ModelSerializer):
     participants = UserListChatSerializer(many=True, read_only=True)
+    last_message = serializers.SerializerMethodField()
 
     class Meta:
         model = Chat
-        fields = ['id', 'participants', 'created_at']
+        fields = ['id', 'participants', 'created_at', 'last_message']
 
-        def to_representation(self, instance):
-            representation = super().to_representation(instance)
-            return representation
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return representation
+
+    def get_last_message(self, obj):
+        last_message = obj.messages.first()
+
+        if last_message:
+            return {
+                'content': last_message.content,
+                'timestamp': last_message.timestamp
+            }
+
+        return None
 
 class MessageSerializer(serializers.ModelSerializer):
     sender = UserListChatSerializer()
@@ -27,15 +39,13 @@ class MessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = ['id', 'chat', 'sender', 'content', 'timestamp', 'participants']
 
-        def get_participants(self, obj):
-            return UserListChatSerializer(obj.chat.participants.all(), many=True).data
+    def get_participants(self, obj):
+        return UserListChatSerializer(obj.chat.participants.all(), many=True).data
 
 
 class CreateMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = ['chat', 'content']
-
-        def create(self, validate_data):
-            message = Message.objects.create(**validate_data)
-            return message
+        fields = ['id', 'chat', 'sender', 'content', 'timestamp', 'is_read']
+        read_only_fields = ['id', 'chat', 'sender', 'timestamp', 'is_read']
+        
