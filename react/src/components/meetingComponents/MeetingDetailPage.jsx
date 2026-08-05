@@ -12,7 +12,6 @@ export default function MeetingDetailPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isCreatingChat, setIsCreatingChat] = useState(false);
   
-  
   const [isParticipant, setIsParticipant] = useState(false);
   const [seats, setSeats] = useState(0);
   const [isJoining, setIsJoining] = useState(false);
@@ -28,18 +27,18 @@ export default function MeetingDetailPage() {
         setIsLoading(true);
         const token = localStorage.getItem("access_token"); 
         const response = await fetch(`http://localhost:8000/api/meetings/${id}/`, {
-          headers: token ? { "Authorization": `Bearer ${token}` } : {}
+          headers: token ? { "Authorization": `Bearer ${token}` } : {},
+          cache: "no-store" 
         });
+        
         if (!response.ok) throw new Error(`Błąd: ${response.status}`);
-        
         const data = await response.json();
+
         setMeeting(data);
-        
-        
         setSeats(data.number_of_seats || 0);
         
-        if (data.participants && myId) {
-            setIsParticipant(data.participants.includes(myId));
+        if (data.is_participant !== undefined) {
+            setIsParticipant(data.is_participant);
         }
 
       } catch (err) {
@@ -48,10 +47,10 @@ export default function MeetingDetailPage() {
         setIsLoading(false);
       }
     };
+    
     fetchMeetingDetail();
   }, [id, myId]);
 
-  
   const handleJoinToggle = async () => {
     if (!myId) {
       alert("Musisz być zalogowany, aby dołączyć.");
@@ -63,7 +62,27 @@ export default function MeetingDetailPage() {
       const token = localStorage.getItem("access_token");
       const action = isParticipant ? "leave" : "join";
 
-      
+      if (action === "join" && Number(meeting.price) > 0) {
+        const response = await fetch(`http://localhost:8000/${id}/payment/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (response.ok && (data.url || data.checkout_url)) {
+          window.location.href = data.url || data.checkout_url; 
+          return; 
+        } else {
+          alert(data.error || "Błąd inicjalizacji płatności");
+          setIsJoining(false);
+          return;
+        }
+      }
+
       const response = await fetch(`http://localhost:8000/meeting/${id}/participation/`, {
         method: "POST",
         headers: {
@@ -76,7 +95,6 @@ export default function MeetingDetailPage() {
       const data = await response.json();
 
       if (response.ok) {
-        
         setIsParticipant(data.status === "joined");
         if (data.number_of_seats !== undefined) {
           setSeats(data.number_of_seats);
@@ -92,7 +110,6 @@ export default function MeetingDetailPage() {
   };
 
   const handleStartChat = async () => {
-    
     if (!myId) {
       alert("Błąd: Nie można zidentyfikować użytkownika. Odśwież stronę.");
       return;
@@ -151,7 +168,6 @@ export default function MeetingDetailPage() {
 
           <div className="border-t border-gray-700 pt-6 flex flex-col gap-4">
             
-            
             {!isOwner && (
               <>
                 <button 
@@ -170,7 +186,7 @@ export default function MeetingDetailPage() {
                     : isParticipant 
                       ? "Opuść spotkanie" 
                       : seats > 0 
-                        ? "Zapisz się na spotkanie" 
+                        ? (Number(meeting.price) > 0 ? `Kup dostęp (${meeting.price} zł)` : "Zapisz się na spotkanie")
                         : "Brak wolnych miejsc"
                   }
                 </button>
@@ -184,7 +200,6 @@ export default function MeetingDetailPage() {
                 </button>
               </>
             )}
-
             
             {isOwner && (
               <div className="text-center py-3 bg-gray-900 rounded-xl border border-gray-700 text-emerald-400 font-medium">

@@ -18,7 +18,8 @@ import Map from "./components/Map";
 import MeetingDetailPage from "./components/meetingComponents/MeetingDetailPage";
 import CompleteProfileForm from "./components/CompleteProfileForm";
 import CloseMeetingsPage from "./components/meetingComponents/CloseMeetingsPage";
-import ChatPage from "./components/ChatPage"; 
+import ChatPage from "./components/ChatPage";
+import PaymentSuccess from "./components/PaymentSuccess"; 
 
 function AppLayout() {
   return (
@@ -133,6 +134,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <ChatPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payment-success"
+          element={
+            <ProtectedRoute>
+              <PaymentSuccess />
             </ProtectedRoute>
           }
         />
