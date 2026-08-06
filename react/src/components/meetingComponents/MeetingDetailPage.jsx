@@ -12,6 +12,10 @@ export default function MeetingDetailPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isCreatingChat, setIsCreatingChat] = useState(false);
   
+  const [isParticipant, setIsParticipant] = useState(false);
+  const [seats, setSeats] = useState(0);
+  const [isJoining, setIsJoining] = useState(false);
+  
   const currentUserId = localStorage.getItem("user_id"); 
   const myId = (currentUserId && currentUserId !== "undefined" && currentUserId !== "null") 
     ? parseInt(currentUserId, 10) 
@@ -23,18 +27,87 @@ export default function MeetingDetailPage() {
         setIsLoading(true);
         const token = localStorage.getItem("access_token"); 
         const response = await fetch(`http://localhost:8000/api/meetings/${id}/`, {
-          headers: token ? { "Authorization": `Bearer ${token}` } : {}
+          headers: token ? { "Authorization": `Bearer ${token}` } : {},
+          cache: "no-store" 
         });
+        
         if (!response.ok) throw new Error(`Błąd: ${response.status}`);
-        setMeeting(await response.json());
+        const data = await response.json();
+
+        setMeeting(data);
+        setSeats(data.number_of_seats || 0);
+        
+        if (data.is_participant !== undefined) {
+            setIsParticipant(data.is_participant);
+        }
+
       } catch (err) {
         setError(err.message);
       } finally {
         setIsLoading(false);
       }
     };
+    
     fetchMeetingDetail();
-  }, [id]);
+  }, [id, myId]);
+
+  const handleJoinToggle = async () => {
+    if (!myId) {
+      alert("Musisz być zalogowany, aby dołączyć.");
+      return;
+    }
+
+    setIsJoining(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      const action = isParticipant ? "leave" : "join";
+
+      if (action === "join" && Number(meeting.price) > 0) {
+        const response = await fetch(`http://localhost:8000/${id}/payment/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (response.ok && (data.url || data.checkout_url)) {
+          window.location.href = data.url || data.checkout_url; 
+          return; 
+        } else {
+          alert(data.error || "Błąd inicjalizacji płatności");
+          setIsJoining(false);
+          return;
+        }
+      }
+
+      const response = await fetch(`http://localhost:8000/meeting/${id}/participation/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ action: action })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setIsParticipant(data.status === "joined");
+        if (data.number_of_seats !== undefined) {
+          setSeats(data.number_of_seats);
+        }
+      } else {
+        alert(data.detail || "Wystąpił błąd");
+      }
+    } catch (err) {
+      alert("Błąd połączenia z serwerem: " + err.message);
+    } finally {
+      setIsJoining(false);
+    }
+  };
 
   const handleStartChat = async () => {
     if (!myId) {
@@ -75,7 +148,13 @@ export default function MeetingDetailPage() {
       <div className="max-w-3xl mx-auto flex flex-col gap-6">
         
         <div className="bg-gray-800 border border-gray-700 rounded-2xl p-6 md:p-8 shadow-xl">
-          <h1 className="text-3xl font-bold text-gray-100 mb-4">{meeting.title}</h1>
+          <div className="flex justify-between items-start mb-4">
+            <h1 className="text-3xl font-bold text-gray-100">{meeting.title}</h1>
+            
+            <div className="bg-gray-700 px-4 py-2 rounded-lg text-sm font-semibold">
+              Miejsca: <span className={seats > 0 ? "text-emerald-400" : "text-red-400"}>{seats}</span>
+            </div>
+          </div>
           
           <div className="flex items-center gap-4 mb-8 p-4 bg-gray-900/50 rounded-xl border border-gray-700/50">
             <div className="w-12 h-12 rounded-full bg-emerald-600/20 text-emerald-400 font-bold text-xl flex items-center justify-center">
@@ -87,21 +166,47 @@ export default function MeetingDetailPage() {
             </div>
           </div>
 
-          <div className="border-t border-gray-700 pt-6">
-            <button className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-purple-500/20 mb-4">
-              Zapisz się na spotkanie
-            </button>
-            
+          <div className="border-t border-gray-700 pt-6 flex flex-col gap-4">
             
             {!isOwner && (
-              <button 
-                onClick={handleStartChat}
-                disabled={isCreatingChat}
-                className="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-colors border border-gray-600 disabled:opacity-50"
-              >
-                {isCreatingChat ? "Otwieranie czatu..." : "Napisz wiadomość do organizatora"}
-              </button>
+              <>
+                <button 
+                  onClick={handleJoinToggle}
+                  disabled={isJoining || (!isParticipant && seats <= 0)}
+                  className={`w-full py-3 font-semibold rounded-xl transition-colors shadow-lg disabled:opacity-50 ${
+                    isParticipant 
+                      ? "bg-red-600 hover:bg-red-500 text-white shadow-red-500/20" 
+                      : seats > 0 
+                        ? "bg-purple-600 hover:bg-purple-500 text-white shadow-purple-500/20" 
+                        : "bg-gray-600 text-gray-300 cursor-not-allowed" 
+                  }`}
+                >
+                  {isJoining 
+                    ? "Przetwarzanie..." 
+                    : isParticipant 
+                      ? "Opuść spotkanie" 
+                      : seats > 0 
+                        ? (Number(meeting.price) > 0 ? `Kup dostęp (${meeting.price} zł)` : "Zapisz się na spotkanie")
+                        : "Brak wolnych miejsc"
+                  }
+                </button>
+              
+                <button 
+                  onClick={handleStartChat}
+                  disabled={isCreatingChat}
+                  className="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-colors border border-gray-600 disabled:opacity-50"
+                >
+                  {isCreatingChat ? "Otwieranie czatu..." : "Napisz wiadomość do organizatora"}
+                </button>
+              </>
             )}
+            
+            {isOwner && (
+              <div className="text-center py-3 bg-gray-900 rounded-xl border border-gray-700 text-emerald-400 font-medium">
+                Jesteś organizatorem tego spotkania
+              </div>
+            )}
+
           </div>
         </div>
 

@@ -11,6 +11,8 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from payment.models import HistoryPayment
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 # Create your views here.
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -37,8 +39,8 @@ class CreatePaymentView(APIView):
             }],
             mode='payment',
             billing_address_collection='required',
-            success_url=request.build_absolute_uri(reverse('success')) + f'?meeting_id={meeting.id}',
-            cancel_url=request.build_absolute_uri(reverse('cancel')),
+            success_url=f"http://localhost:5173/payment-success?meeting_id={meeting.id}",
+            cancel_url=f"http://localhost:5173/meeting/{meeting.id}",
             customer_email=user_email,
             metadata = {
             'user_id': request.user.id,
@@ -46,7 +48,7 @@ class CreatePaymentView(APIView):
         }
         )
         
-        return redirect(checkout_session.url)
+        return Response({'checkout_url': checkout_session.url}, status=status.HTTP_200_OK)
 
     def get(self, request, *args, **kwargs):
         return HttpResponseNotAllowed(['POST']) 
@@ -65,7 +67,7 @@ def stripe_webhook(request):
     if request.method == 'POST':
         payload = request.body
         sig_header = request.headers.get('Stripe-Signature')
-        endpoint_secret = settings.WEBHOOK_SECRET
+        endpoint_secret = settings.STRIPE_WEBHOOK_SECREAT
 
         event = None
 
