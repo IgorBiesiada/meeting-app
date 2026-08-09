@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import MeetingComments from "./MeetingComments"; 
+import StarRating from "../StarRating"; 
 
 export default function MeetingDetailPage() {
   const { id } = useParams();
@@ -33,7 +34,7 @@ export default function MeetingDetailPage() {
         
         if (!response.ok) throw new Error(`Błąd: ${response.status}`);
         const data = await response.json();
-
+        console.log("DANE Z BACKENDU:", data);
         setMeeting(data);
         setSeats(data.number_of_seats || 0);
         
@@ -148,10 +149,20 @@ export default function MeetingDetailPage() {
       <div className="max-w-3xl mx-auto flex flex-col gap-6">
         
         <div className="bg-gray-800 border border-gray-700 rounded-2xl p-6 md:p-8 shadow-xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-900 rounded-lg border border-gray-700 mb-4 shadow-sm">
+            <span className="text-yellow-400 text-xl leading-none">★</span>
+            <span className="text-sm font-bold text-gray-200">
+              {meeting.rating === 'Brak ocen' || meeting.rating == null
+                ? 'Brak ocen' 
+                : `${Number(meeting.rating).toFixed(1)} / 6`}
+            </span>
+          </div>
+          
+
           <div className="flex justify-between items-start mb-4">
             <h1 className="text-3xl font-bold text-gray-100">{meeting.title}</h1>
             
-            <div className="bg-gray-700 px-4 py-2 rounded-lg text-sm font-semibold">
+            <div className="bg-gray-700 px-4 py-2 rounded-lg text-sm font-semibold flex-shrink-0 ml-4">
               Miejsca: <span className={seats > 0 ? "text-emerald-400" : "text-red-400"}>{seats}</span>
             </div>
           </div>
@@ -210,7 +221,14 @@ export default function MeetingDetailPage() {
           </div>
         </div>
 
+        
+        {isParticipant && !isOwner && (
+          <StarRating meetingId={meeting.id} />
+        )}
+
+        
         <MeetingComments meetingId={meeting.id} />
+        
       </div>
     </div>
   );

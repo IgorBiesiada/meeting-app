@@ -4,4 +4,5 @@ from rating.models import Rating
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
-        fields = ['rating']
+        fields = ['user', 'meeting', 'rating']
+        read_only_fields = ['user', 'meeting']
