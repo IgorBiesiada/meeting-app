@@ -7,15 +7,16 @@ export default function MeetingComments({ meetingId }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-
   
+  // 1. Dodajemy stan na błąd z AI (walidacji)
+  const [validationError, setValidationError] = useState(null);
+
   useEffect(() => {
     if (isCommentsOpen) {
       const fetchComments = async () => {
         setIsLoading(true);
         setError(null);
         try {
-          
           const token = localStorage.getItem("access_token");
           const response = await fetch(`http://localhost:8000/api/comments_list/${meetingId}/`, {
             method: "GET",
@@ -50,6 +51,7 @@ export default function MeetingComments({ meetingId }) {
     
     const token = localStorage.getItem("access_token");
     setIsSubmitting(true);
+    setValidationError(null); 
     
     try {
       const response = await fetch(`http://localhost:8000/api/add_comment/${meetingId}/`, {
@@ -58,18 +60,23 @@ export default function MeetingComments({ meetingId }) {
           "Content-Type": "application/json",
           ...(token ? { "Authorization": `Bearer ${token}` } : {})
         },
-        
         body: JSON.stringify({ text: newComment }),
       });
 
+      
+      const data = await response.json();
+
       if (!response.ok) {
+       
+        if (response.status === 400 && data.text) {
+          setValidationError(data.text[0]);
+          return; 
+        }
         throw new Error("Nie udało się dodać komentarza");
       }
 
-      const addedComment = await response.json();
       
-      
-      setComments([...comments, addedComment]);
+      setComments([...comments, data]);
       setNewComment(""); 
     } catch (err) {
       console.error(err);
@@ -102,17 +109,23 @@ export default function MeetingComments({ meetingId }) {
         </svg>
       </button>
 
-      
       <div className={`transition-all duration-300 ease-in-out ${isCommentsOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
         <div className="p-6 pt-0 border-t border-gray-700/50">
           
+          {validationError && (
+            <div className="mb-4 mt-4 p-3 bg-red-900/40 border border-red-500/50 rounded-xl text-red-300 text-sm font-semibold flex items-center gap-2">
+              <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              {validationError}
+            </div>
+          )}
           
-          <form onSubmit={handleCommentSubmit} className="mb-8 mt-6 flex gap-3 items-start">
+          <form onSubmit={handleCommentSubmit} className="mb-8 mt-2 flex gap-3 items-start">
             
             <div className="shrink-0 w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold text-white shadow-sm mt-0.5">
               Ty
             </div>
-            
             
             <div className="relative flex-1">
               <input
@@ -121,7 +134,7 @@ export default function MeetingComments({ meetingId }) {
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Napisz komentarz..."
                 disabled={isSubmitting}
-                className="w-full bg-gray-900 border border-gray-700 rounded-full pl-5 pr-12 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all placeholder-gray-500 disabled:opacity-50"
+                className={`w-full bg-gray-900 border ${validationError ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500' : 'border-gray-700 focus:border-purple-500 focus:ring-purple-500'} rounded-full pl-5 pr-12 py-2.5 text-sm text-gray-200 focus:outline-none focus:ring-1 transition-all placeholder-gray-500 disabled:opacity-50`}
               />
               <button 
                 type="submit"
@@ -135,7 +148,6 @@ export default function MeetingComments({ meetingId }) {
             </div>
           </form>
 
-          
           {isLoading ? (
             <div className="text-center text-gray-500 text-sm py-4">Ładowanie dyskusji...</div>
           ) : error ? (
@@ -155,7 +167,7 @@ export default function MeetingComments({ meetingId }) {
                       <span className="font-semibold text-sm text-gray-200 block mb-0.5">
                         {comment.author || "Użytkownik"}
                       </span>
-                      <span className="text-sm text-gray-300">
+                      <span className="text-sm text-gray-300 break-words">
                         {comment.text}
                       </span>
                     </div>
