@@ -5,3 +5,6 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ['text']
+
+    def validate_text(self, text):
+        pass
