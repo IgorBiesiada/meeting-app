@@ -1,9 +1,7 @@
 from django.test import TestCase
 import pytest
 from django.urls import reverse
-from user_messages.forms import MessageForm
-from rest_framework.user_messages.models import Message
-from rest_framework.users.models import User
+
 
 
 # Create your tests here.

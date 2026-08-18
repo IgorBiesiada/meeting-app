@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from .models import User
-from django.core.mail import send_mail
+#from django.core.mail import send_mail
 from config.settings import DEFAULT_FROM_EMAIL
 from django.urls import reverse_lazy
 from rest_framework import viewsets
