@@ -214,7 +214,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+#RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
 EMAIL_HOST = os.environ.get('EMAIL_HOST')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
@@ -227,6 +227,6 @@ STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECREAT = os.environ.get('STRIPE_WEBHOOK_SECREAT')
 
 
-GROP_API_KEY = os.environ.get('GROP_API_KEY')
+GROQ_API_KEY = os.environ.get('GROP_API_KEY')
 
 GEOAPIFY_KEY = os.environ.get('GEOAPIFY_KEY')

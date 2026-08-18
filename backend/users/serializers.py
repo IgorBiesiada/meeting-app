@@ -10,6 +10,21 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'first_name', 'last_name', 'username', 'email', 'password', 'city', 'region']
         extra_kwargs = {'password': {'write_only': True}}
     
+    def validate_first_name(self, value):
+        for char in value:
+            if char.isdigit():
+                raise serializers.ValidationError("Imię nie może zawierać cyfr")
+
+        return value
+
+    def validate_last_name(self, value):
+        for char in value:
+            if char.isdigit():
+                raise serializers.ValidationError("Nazwisko nie może zawierać cyfr")
+        
+        return value
+
+
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user

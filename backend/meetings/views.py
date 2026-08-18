@@ -1,6 +1,4 @@
 from django.utils import timezone
-from django.core.mail import send_mail
-from django.shortcuts import render
 from meetings.models import Meeting
 from django.http import JsonResponse
 from config.settings import DEFAULT_FROM_EMAIL
@@ -17,6 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.db.models import Q
 from rating.models import Rating
+#from config.services import send_mail
 # Create your views here.
 
 
@@ -53,19 +52,6 @@ class MeetingViewSet(viewsets.ModelViewSet):
 
         return queryset
     
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
-#        self.send_mail(self.request.user.email)
-
-#    def send_mail(self, user_mail):
-#        send_mail(
-#            'let s meet',
-#            'Właśnie utworzyłeś spotkanie!!!! Gratulacje!!!!',
-#            DEFAULT_FROM_EMAIL,
-#            [user_mail],
-#            fail_silently=False
-#        )
-
     @action(detail=False, methods=['get'])
     def my_meetings(self, request):
         queryset = Meeting.objects.filter(created_by=request.user)
