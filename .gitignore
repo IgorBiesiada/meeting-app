@@ -21,7 +21,7 @@ db.sqlite3
 .env
 .env.*
 
-migrations/
+.pytest_cache/
 
 .vscode/
 .idea/
