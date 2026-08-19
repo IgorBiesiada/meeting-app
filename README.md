@@ -23,8 +23,8 @@
 | **Config Management** | `python-dotenv` (`.env`-based settings) |
 | **CORS** | `django-cors-headers` — API opened to the React (Vite) frontend origin |
 | **Frontend** | React + Vite (SPA) — `react-router-dom` for routing, Context API for auth state, `react-leaflet` + MapTiler tiles for the interactive map, Tailwind CSS v4 for styling, Geoapify Autocomplete for location input |
-| **Testing** | `pytest`, `pytest-django` |
-| **Planned** | Docker / Docker Compose (containerization — see [Roadmap](#-roadmap)) |
+| **Testing** | `pytest`, `pytest-django`, `model_bakery` (for quick test-object creation), with a **GitHub Actions CI** workflow running the suite against a real PostgreSQL service on every push/PR to `master`/`develop` |
+| **DevOps / Infra** | **Docker Compose** — three services (`db`: PostgreSQL 17, `backend`: Django on `python:3.12-slim`, `frontend`: React/Vite on `node:24-alpine`); the backend's `Dockerfile` runs migrations automatically on container start, the frontend's runs `npm run dev -- --host` so the Vite dev server is reachable from outside the container |
 
 ---
 
@@ -38,10 +38,10 @@
 - **⭐ Rating system** — one rating per user/meeting (`unique_together`), values 1–6 (see `Rating.rating` choices), with average rating aggregation (`Avg` on related `Rating` objects).
 - **💬 Real-time-style chat system** — replaced simple one-off messages with a proper `Chat`/`Message` model: two-participant chats are created (or reused, if one already exists between the same two users) via `ChatListCreateView`, messages are scoped to a chat and ordered chronologically, each message tracks `is_read`, and a custom `ChatManager` prefetches participants (`prefetch_related`) to avoid N+1 queries. Message deletion is restricted to the original sender.
 - **🌐 Social authentication** — GitHub and Discord OAuth2 login implemented via `dj-rest-auth`'s `SocialLoginView` (`GitHubLoginView`, `DiscordLoginView`), with `django-allauth` as the OAuth2 client and callback URLs pointing to the React frontend (`localhost:5173/oauth/<provider>/callback`).
-- **👤 Account management** — dedicated endpoints for changing email, username and password (`@action` routes on `UserViewSet`), each validated with a custom serializer, plus a `me` endpoint (`GET`/`PATCH`) for fetching and updating the current user's own profile.
+- **👤 Account management** — dedicated endpoints for changing email, username and password (`@action` routes on `UserViewSet`), each validated with a custom serializer, plus a `me` endpoint (`GET`/`PATCH`) for fetching and updating the current user's own profile. Registration also validates that `first_name`/`last_name` don't contain digits.
 - **📍 User geolocation fields** — `User` model now stores `city`, `region`, `lat`, and `lon` as free-text fields, laying the groundwork for the `close_meetings` action (meetings near the current user) and Geoapify-based geocoding.
 - **🔐 JWT authentication (backend) vs. current frontend implementation** — `dj-rest-auth` is configured to issue tokens as **HttpOnly cookies** via `/auth/login/`, with a **custom token serializer** blocking login for banned users (`is_baned` flag). ⚠️ The current React client, however, authenticates against the raw SimpleJWT endpoint (`/users/api/token/`), which returns tokens in the JSON body, and stores them in `localStorage` — the more common but XSS-exposed pattern. See the note in [Roadmap](#-roadmap).
-- **✉️ Transactional emails** — SendGrid integration for automated notifications.
+- **✉️ Transactional emails (currently disabled)** — a SendGrid-based `services.py` helper exists, but the call site in `UserViewSet.perform_create` is commented out for now, so no emails are actually sent yet.
 - **🛡️ Custom permissions** — object-level `IsOwnerOrReadOnly` permission (read access for everyone, write access restricted to the meeting's creator).
 - **🧩 API-first architecture** — the backend is a pure DRF API (no server-rendered templates for the app itself), decoupled from and consumed by a separate React (Vite) frontend via `django-cors-headers`.
 
@@ -75,15 +75,21 @@ src/
 
 ---
 
-Create a `.env` file in the project root with the following keys:
+Create a `.env` file in the project **root** (the same folder as `docker-compose.yaml`) with the following keys:
 
 ```env
 # Core Django
 SECRET_KEY=your-django-secret-key
 DEBUG=1
 
-# Database (PostgreSQL connection string)
-DB_CONNECTION_STRING=postgres://user:password@host:port/dbname
+# Database — used by the Postgres container in docker-compose.yaml
+DB_NAME=lets_meet
+DB_USER=postgres
+DB_PASSWORD=your-db-password
+
+# Database — used by Django itself (dj-database-url).
+# With Docker Compose, host is the service name ("db"), not localhost:
+DB_CONNECTION_STRING=postgres://postgres:your-db-password@db:5432/lets_meet
 
 # Social Auth — GitHub
 GITHUB_CLIENT_ID=your-github-client-id
@@ -116,6 +122,7 @@ GEOAPIFY_KEY=your-geoapify-api-key
 
 > ⚠️ Never commit your `.env` file — make sure it's listed in `.gitignore`.
 > ℹ️ `CORS_ALLOWED_ORIGINS` (currently `http://localhost:5173`, the default Vite dev server port) is set directly in `settings.py`, not via `.env` — update it there if your frontend runs on a different port/origin.
+> ℹ️ `DB_NAME`/`DB_USER`/`DB_PASSWORD` and `DB_CONNECTION_STRING` describe the *same* database from two angles — the former configures the Postgres container, the latter is what Django actually connects with — keep the username/password/db name in sync between them.
 
 ### Frontend (`.env`)
 
@@ -130,12 +137,41 @@ VITE_GEOAPIFY_KEY=your-geoapify-api-key
 
 ---
 
-## 🛠️ Local Setup
+## 🐳 Running with Docker (recommended)
+
+The repo root has `backend/`, `react/`, and a `docker-compose.yaml` that wires up PostgreSQL, the Django API, and the Vite dev server together.
 
 ```bash
 # 1. Clone the repository
 git clone https://github.com/your-username/lets-meet.git
 cd lets-meet
+
+# 2. Set up the root .env (see above) — used by all three services
+cp .env.example .env          # then fill in the values
+
+# 3. Build and start everything (Postgres, Django, React)
+docker compose up --build
+
+# 4. (optional) Create a superuser for /admin access, in a separate terminal
+docker compose exec backend python manage.py createsuperuser
+```
+
+The backend `Dockerfile`'s startup command already runs `python manage.py migrate` before `runserver`, so migrations are applied automatically every time the `backend` container starts — no separate step needed.
+
+- Backend API → `http://localhost:8000/`
+- Frontend (Vite) → `http://localhost:5173/`
+- PostgreSQL → `localhost:5432` (only exposed for local DB tools; Django connects to it via the `db` service name inside Docker)
+
+The `backend` and `frontend` services mount the local `./backend` and `./react` folders as volumes, so code changes on your machine are picked up without rebuilding the image (Vite's hot reload; Django's dev server auto-reload).
+
+## 🛠️ Manual Local Setup (without Docker)
+
+If you'd rather run things directly on your machine:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-username/lets-meet.git
+cd lets-meet/backend
 
 # 2. Create and activate a virtual environment
 python -m venv venv
@@ -145,10 +181,10 @@ source venv/bin/activate      # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 # 4. Set up environment variables
-cp .env.example .env          # then fill in the values (see above)
+cp ../.env.example .env       # then fill in the values (see above)
 
-# 5. Make sure a PostgreSQL instance is running and DB_CONNECTION_STRING points to it
-#    (locally via Docker, or a managed instance e.g. Render/ElephantSQL)
+# 5. Make sure a PostgreSQL instance is running and DB_CONNECTION_STRING
+#    points to it (e.g. localhost:5432 instead of db:5432 if not using Docker)
 
 # 6. Apply database migrations
 python manage.py migrate
@@ -179,8 +215,8 @@ The CLI prints a webhook signing secret (`whsec_...`) — put that value in `STR
 ### Frontend Setup
 
 ```bash
-# From the frontend project's root (adjust the path to your actual folder)
-cd frontend
+# From the repo root
+cd react
 
 # Install dependencies
 npm install
@@ -193,6 +229,10 @@ npm run dev
 ```
 
 The frontend will be available at `http://localhost:5173/`. Make sure the Django API is running first, and that `CORS_ALLOWED_ORIGINS` in `settings.py` matches the port Vite prints.
+
+## ✅ Continuous Integration
+
+Every push and pull request to `master`/`develop` triggers a **GitHub Actions** workflow (`.github/workflows/testing.yaml`) that spins up a real PostgreSQL service container and runs the full `pytest` suite against it — the same tests you'd run locally, but automated on every change.
 
 **Useful endpoints:**
 
@@ -236,6 +276,7 @@ Building **Let's Meet** was primarily an exercise in connecting a Django backend
 - **Building idempotent "get or create" logic for a resource** — `ChatListCreateView.create()` checks for an existing 1-to-1 chat between two users before creating a new one, returning `200` for an existing chat vs. `201` for a newly created one.
 - **Using an LLM as a moderation layer** — prompting `llama-3.1-8b-instant` via Groq to return a strict, parseable JSON verdict on comment toxicity, and enforcing that verdict inside a DRF serializer's `validate_*` method rather than as a separate post-processing step.
 - **Writing database-backed tests with `pytest-django`** — covering model creation and view behavior against a real test database, including fixtures for related models and mocked email sending.
+- **Sharing test setup with `conftest.py` fixtures** — reusable `user1`/`user2` fixtures and pre-authenticated `APIClient` fixtures (`auth_client1`, `auth_client2`) live at the project root, so any app's test suite can reuse the same two-user setup instead of repeating it. The `users` app uses them for registration validation (rejecting digits in names), account creation, and the JWT token endpoint (`/api/token/`) for valid/invalid credentials; `user_messages` reuses the same fixtures to test chat creation between two users and posting a message into an existing chat; `rating` combines them with `model_bakery` (`baker.make(Meeting)`) to quickly generate a throwaway meeting to rate, without hand-filling every field a real meeting needs.
 - **Securing API endpoints with JWT stored in HttpOnly cookies** — configured the backend (`dj-rest-auth` + `SimpleJWT`) to issue access/refresh tokens as HttpOnly cookies instead of the common (but XSS-vulnerable) `localStorage` approach. I later realized the React client doesn't actually use this flow yet (it calls the raw token endpoint and stores tokens in `localStorage`) — a good example of a backend/frontend contract mismatch to reconcile next.
 - **Extending SimpleJWT's authentication flow** — overriding `TokenObtainPairSerializer` to reject login attempts from banned users (`is_baned`) directly at the token-issuance stage, before any session is created.
 - **Designing permission-aware, filterable REST APIs** — implementing object-level permissions (`IsOwnerOrReadOnly`) and query-parameter-driven filtering directly inside DRF `ViewSets`.
@@ -245,13 +286,10 @@ Building **Let's Meet** was primarily an exercise in connecting a Django backend
 
 ## 🗺️ Roadmap
 
-**🔨 Currently in progress**
-- **Transactional emails** — wiring up SendGrid (`services.py`) so key actions, like creating a meeting, trigger a confirmation email to the user.
-
 **⏭️ Next steps**
-- **Docker & Docker Compose** — containerize the app (Django + PostgreSQL) for a one-command local setup and easier deployment.
+- **Transactional emails** — the SendGrid call in `UserViewSet.perform_create` is currently commented out; re-enable it (and extend it to other actions, like creating a meeting) once the messaging is finalized.
 - A few additional user-facing features (details TBD as they're built).
-- More automated tests, covering modules that are still light on coverage (payments, participations, ratings) with `pytest-django`.
+- More automated tests, covering modules that are still light on coverage (payments, participations) with `pytest-django`.
 - Query optimization pass across the API where it makes sense (e.g. further `select_related`/`prefetch_related` on list endpoints).
 
 **🧹 Known cleanup items**
