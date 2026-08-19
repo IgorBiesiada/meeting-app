@@ -227,6 +227,6 @@ STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECREAT = os.environ.get('STRIPE_WEBHOOK_SECREAT')
 
 
-GROQ_API_KEY = os.environ.get('GROP_API_KEY')
+GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
 
 GEOAPIFY_KEY = os.environ.get('GEOAPIFY_KEY')

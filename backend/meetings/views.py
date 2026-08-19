@@ -52,6 +52,9 @@ class MeetingViewSet(viewsets.ModelViewSet):
 
         return queryset
     
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
     @action(detail=False, methods=['get'])
     def my_meetings(self, request):
         queryset = Meeting.objects.filter(created_by=request.user)
